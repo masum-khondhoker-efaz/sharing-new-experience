@@ -12,7 +12,7 @@ import { socialLoginRoutes } from "./app/modules/SocialLogin/socialLogin.route";
 
 const app: Application = express();
 export const corsOptions = {
-  origin: ["http://localhost:3001", "http://localhost:3000"],
+  origin: ["http://localhost:3001", "http://localhost:3000", "https://starrd-app.vercel.app/"],
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
