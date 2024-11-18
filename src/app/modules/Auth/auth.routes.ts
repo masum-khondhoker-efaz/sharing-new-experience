@@ -42,4 +42,14 @@ router.post(
   AuthController.resetPassword
 )
 
+// router.post(
+//   '/login-with-google',
+//   AuthController.loginWithGoogle
+// )
+
+// router.post(
+//   '/login-with-facebook',
+//   AuthController.loginWithFacebook
+// )
+
 export const AuthRoutes = router;

@@ -91,7 +91,27 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
   })
 });
 
+// const loginWithGoogle = catchAsync(async (req: Request, res: Response) => {
+//   const result = await AuthServices.loginWithGoogleIntoDb(req.body);
+//   res.cookie("token", result.token, { httpOnly: true });
+//   sendResponse(res, {
+//     statusCode: httpStatus.OK,
+//     success: true,
+//     message: "User logged in successfully",
+//     data: result,
+//   });
+// });
 
+// const loginWithFacebook = catchAsync(async (req: Request, res: Response) => {
+//   const result = await AuthServices.loginWithFacebookIntoDb(req.body);
+//   res.cookie("token", result.token, { httpOnly: true });
+//   sendResponse(res, {
+//     statusCode: httpStatus.OK,
+//     success: true,
+//     message: "User logged in successfully",
+//     data: result,
+//   });
+// });
 
 export const AuthController = {
   loginUser,
@@ -99,5 +119,7 @@ export const AuthController = {
   getMyProfile,
   changePassword,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  // loginWithGoogle,
+  // loginWithFacebook
 };

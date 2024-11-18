@@ -1,10 +1,12 @@
 import express, { Application, NextFunction, Request, Response } from "express";
-
+import session from "express-session";
 import httpStatus from "http-status";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import GlobalErrorHandler from "./app/middlewares/globalErrorHandler";
 import router from "./app/routes";
+import passport from "passport";
+import { socialLoginRoutes } from "./app/modules/SocialLogin/socialLogin.route";
 
 
 
@@ -28,10 +30,21 @@ app.get("/", (req: Request, res: Response) => {
   res.send({
     success:true,
     statusCode: httpStatus.OK,
-    message: "Welcome to Rydleap API!",
+    message: "Welcome to Starrd App API!",
   });
 });
-
+// Session setup for OAuth
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "default_secret_key",
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: process.env.NODE_ENV === "production" },
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(socialLoginRoutes);
 // Router setup
 app.use("/api/v1", router);
 

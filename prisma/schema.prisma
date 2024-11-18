@@ -13,7 +13,13 @@ model User {
   email        String     @unique
   phoneNumber  String?
   profileImage String?
-  password     String
+  password     String?
+  fcmToken     String?
+  googleId     String?      @unique
+  facebookId   String?      @unique
+  deviceToken  String?
+  points       Int         @default(0)
+  badge        String?
   role         UserRole   @default(USER)
   status       UserStatus @default(ACTIVE)
   createdAt    DateTime   @default(now())

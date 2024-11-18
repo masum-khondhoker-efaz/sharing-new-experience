@@ -11,6 +11,7 @@ import httpStatus from "http-status";
 
 // Create a new user in the database.
 const createUserIntoDb = async (payload: User) => {
+
   const existingUser = await prisma.user.findFirst({
     where: {
      email: payload.email
@@ -25,7 +26,10 @@ const createUserIntoDb = async (payload: User) => {
       );
     }
   }
-  const hashedPassword: string = await bcrypt.hash(
+  if (!payload.password) {
+    throw new ApiError(400, "Password is required");
+  }
+  const hashedPassword = await bcrypt.hash(
     payload.password,
     Number(config.bcrypt_salt_rounds)
   );

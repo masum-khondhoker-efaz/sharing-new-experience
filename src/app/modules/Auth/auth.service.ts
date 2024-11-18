@@ -1,15 +1,21 @@
-import { Secret } from "jsonwebtoken";
-import config from "../../../config";
-import { jwtHelpers } from "../../../helpars/jwtHelpers";
-import prisma from "../../../shared/prisma";
-import * as bcrypt from "bcrypt";
-import ApiError from "../../../errors/ApiErrors";
-import emailSender from "./emailSender";
-import { UserStatus } from "@prisma/client";
-import httpStatus from "http-status";
+import { Secret } from 'jsonwebtoken';
+import config from '../../../config';
+import { jwtHelpers } from '../../../helpars/jwtHelpers';
+import prisma from '../../../shared/prisma';
+import * as bcrypt from 'bcrypt';
+import ApiError from '../../../errors/ApiErrors';
+import emailSender from './emailSender';
+import { Prisma, User, UserRole, UserStatus } from "@prisma/client";
+import httpStatus from 'http-status';
+import admin from '../../../helpars/fireBaseAdmin';
+import { IUser } from './auth.interface';
 
 // user login
-const loginUser = async (payload: { email: string; password: string }) => {
+const loginUser = async (payload: {
+  email: string;
+  password: string;
+  deviceToken: string;
+}) => {
   const userData = await prisma.user.findUnique({
     where: {
       email: payload.email,
@@ -19,16 +25,29 @@ const loginUser = async (payload: { email: string; password: string }) => {
   if (!userData?.email) {
     throw new ApiError(
       httpStatus.NOT_FOUND,
-      "User not found! with this email " + payload.email
+      'User not found! with this email ' + payload.email
     );
+  } else {
+    await prisma.user.update({
+      where: {
+        email: payload.email,
+      },
+      data: {
+        deviceToken: payload.deviceToken,
+      },
+    });
   }
-  const isCorrectPassword: boolean = await bcrypt.compare(
+
+  if (!userData.password) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Password is missing for this user');
+  }
+  const isCorrectPassword = await bcrypt.compare(
     payload.password,
     userData.password
   );
 
   if (!isCorrectPassword) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Password incorrect!");
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Password incorrect!');
   }
   const accessToken = jwtHelpers.generateToken(
     {
@@ -40,7 +59,8 @@ const loginUser = async (payload: { email: string; password: string }) => {
     config.jwt.expires_in as string
   );
 
-  return { token: accessToken };
+  const { password, ...userWithoutPassword } = userData;
+  return { token: accessToken, user: userWithoutPassword };
 };
 
 // get user profile
@@ -85,18 +105,21 @@ const changePassword = async (
   });
 
   if (!user) {
-    throw new ApiError(404, "User not found");
+    throw new ApiError(404, 'User not found');
   }
 
-  const isPasswordValid = await bcrypt.compare(oldPassword, user?.password);
+  if (!user?.password) {
+    throw new ApiError(400, 'User password is missing');
+  }
+  const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
 
   if (!isPasswordValid) {
-    throw new ApiError(401, "Incorrect old password");
+    throw new ApiError(401, 'Incorrect old password');
   }
 
   const hashedPassword = await bcrypt.hash(newPassword, 12);
 
-   await prisma.user.update({
+  await prisma.user.update({
     where: {
       id: decodedToken.id,
     },
@@ -104,7 +127,7 @@ const changePassword = async (
       password: hashedPassword,
     },
   });
-  return { message: "Password changed successfully" };
+  return { message: 'Password changed successfully' };
 };
 
 const forgotPassword = async (payload: { email: string }) => {
@@ -119,13 +142,12 @@ const forgotPassword = async (payload: { email: string }) => {
     config.jwt.reset_pass_secret as Secret,
     config.jwt.reset_pass_token_expires_in as string
   );
-
+  console.log(resetPassToken);
   const resetPassLink =
     config.reset_pass_link + `?userId=${userData.id}&token=${resetPassToken}`;
- 
 
   await emailSender(
-    "Reset Your Password",
+    'Reset Your Password',
     userData.email,
     `
      <div style="font-family: Arial, sans-serif; line-height: 1.6;">
@@ -146,7 +168,7 @@ const forgotPassword = async (payload: { email: string }) => {
 
       `
   );
-  return { message: "Reset password link sent via your email successfully" };
+  return { message: 'Reset password link sent via your email successfully' };
 };
 
 // reset password
@@ -157,7 +179,7 @@ const resetPassword = async (token: string, payload: { password: string }) => {
   );
 
   if (!isValidToken) {
-    throw new ApiError(httpStatus.FORBIDDEN, "Forbidden!");
+    throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden!');
   }
 
   const userData = await prisma.user.findUniqueOrThrow({
@@ -178,8 +200,102 @@ const resetPassword = async (token: string, payload: { password: string }) => {
       password,
     },
   });
-  return { message: "Password reset successfully" };
+  return { message: 'Password reset successfully' };
 };
+
+// const loginWithGoogleIntoDb = async (payload: IUser) => {
+//   if (!payload.fcmToken) {
+//     throw new ApiError(httpStatus.BAD_REQUEST, 'FCM token is required');
+//   }
+//   // const decodedToken = await admin.auth().verifyIdToken(payload.fcmToken);
+//   // if (!decodedToken) {
+//   //   throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid token');
+//   // }
+//   let userData = await prisma.user.findUnique({
+//     where: {
+//       email: payload.email,
+//     },
+//   });
+
+//   if (!userData?.email) {
+//     userData = await prisma.user.create({
+//       data: {
+//         email: payload.email,
+//         name: payload.name,
+//         fcmToken: payload.fcmToken,
+//       },
+//     });
+//   }else{
+//     await prisma.user.update({
+//       where:{
+//         email:payload.email
+//       },
+//       data:{
+//         fcmToken:payload.fcmToken
+//       }
+//     })
+//   }
+
+
+//   const accessToken = jwtHelpers.generateToken(
+//     {
+//       id: userData.id,
+//       email: userData.email,
+//       role: userData.role,
+//     },
+//     config.jwt.jwt_secret as Secret,
+//     config.jwt.expires_in as string
+//   );
+
+//   return { token: accessToken };
+// };
+
+// const loginWithFacebookIntoDb = async (payload: User) => {
+//   if (!payload.fcmToken) {
+//     throw new ApiError(httpStatus.BAD_REQUEST, 'FCM token is required');
+//   }
+//   // const decodedToken = await admin.auth().verifyIdToken(payload.fcmToken);
+//   // if (!decodedToken) {
+//   //   throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid token');
+//   // }
+//   let userData = await prisma.user.findUnique({
+//     where: {
+//       email: payload.email,
+//     },
+//   });
+
+//   if (!userData?.email) {
+//     userData = await prisma.user.create({
+//       data: {
+//         email: payload.email,
+//         name: payload.name,
+//         fcmToken: payload.fcmToken,
+//       },
+//     });
+//   }else{
+//     await prisma.user.update({
+//       where:{
+//         email:payload.email
+//       },
+//       data:{
+//         fcmToken:payload.fcmToken
+//       }
+//     })
+//   }
+
+//   const accessToken = jwtHelpers.generateToken(
+//     {
+//       id: userData.id,
+//       email: userData.email,
+//       role: userData.role,
+//     },
+//     config.jwt.jwt_secret as Secret,
+//     config.jwt.expires_in as string
+//   );
+
+//   return { token: accessToken };
+// };
+
 
 export const AuthServices = {
   loginUser,
@@ -187,4 +303,6 @@ export const AuthServices = {
   changePassword,
   forgotPassword,
   resetPassword,
+  // loginWithGoogleIntoDb,
+  // loginWithFacebookIntoDb,
 };
