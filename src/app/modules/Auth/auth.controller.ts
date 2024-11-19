@@ -39,7 +39,7 @@ const getMyProfile = catchAsync(async (req: Request, res: Response) => {
   const result = await AuthServices.getMyProfile(userToken as string);
   sendResponse(res, {
     success: true,
-    statusCode: 201,
+    statusCode: httpStatus.OK,
     message: "User profile retrieved successfully",
     data: result,
   });
@@ -57,7 +57,7 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
   );
   sendResponse(res, {
     success: true,
-    statusCode: 201,
+    statusCode: httpStatus.OK,
     message: "Password changed successfully",
     data: result,
   });

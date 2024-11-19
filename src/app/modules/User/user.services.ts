@@ -1,52 +1,86 @@
-import prisma from "../../../shared/prisma";
-import ApiError from "../../../errors/ApiErrors";
-import { IUser, IUserFilterRequest } from "./user.interface";
-import * as bcrypt from "bcrypt";
-import { IPaginationOptions } from "../../../interfaces/paginations";
-import { paginationHelper } from "../../../helpars/paginationHelper";
-import { Prisma, User, UserRole, UserStatus } from "@prisma/client";
-import { userSearchAbleFields } from "./user.costant";
-import config from "../../../config";
-import httpStatus from "http-status";
+import prisma from '../../../shared/prisma';
+import ApiError from '../../../errors/ApiErrors';
+import { IUser, IUserFilterRequest } from './user.interface';
+import * as bcrypt from 'bcrypt';
+import { IPaginationOptions } from '../../../interfaces/paginations';
+import { paginationHelper } from '../../../helpars/paginationHelper';
+import { Prisma, User, UserRole, UserStatus } from '@prisma/client';
+import { userSearchAbleFields } from './user.costant';
+import config from '../../../config';
+import httpStatus from 'http-status';
 
 // Create a new user in the database.
-const createUserIntoDb = async (payload: User) => {
-
+const createUserIntoDb = async (payload: IUser) => {
+  // Check if user already exists by email
   const existingUser = await prisma.user.findFirst({
     where: {
-     email: payload.email
+      email: payload.email,
     },
   });
 
   if (existingUser) {
-    if (existingUser.email === payload.email) {
-      throw new ApiError(
-        400,
-        `User with this email ${payload.email} already exists`
-      );
-    }
+    throw new ApiError(
+      400,
+      `User with this email ${payload.email} already exists`
+    );
   }
+
+  // Ensure password is provided
   if (!payload.password) {
-    throw new ApiError(400, "Password is required");
+    throw new ApiError(400, 'Password is required');
   }
+
+  // Hash the password
   const hashedPassword = await bcrypt.hash(
     payload.password,
     Number(config.bcrypt_salt_rounds)
   );
 
+  // Create new user
   const result = await prisma.user.create({
-    data: { ...payload, password: hashedPassword },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-      createdAt: true,
-      updatedAt: true,
+    data: {
+      ...payload,
+      password: hashedPassword,
     },
   });
 
-  return result;
+  // Fetch points from PointsLevel where name is "Join into app"
+  const point = await prisma.pointsLevel.findFirst({
+    where: {
+      name: 'Join into app',
+    },
+    select: {
+      points: true,
+    },
+  });
+
+  // If pointsLevel for "Join into app" not found, throw error
+  if (!point) {
+    throw new ApiError(404, "Points level 'Join into app' not found");
+  }
+
+
+  let updatedUser;
+  // Check if role is USER and update points
+  if (result.role === UserRole.USER) {
+    // Increment points for the user
+     updatedUser = await prisma.user.update({
+      where: { id: result.id },
+      data: { points:  point.points },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        points: true,
+        badge: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  }
+
+  return updatedUser;
 };
 
 // reterive all users from the database also searcing anf filetering
@@ -64,7 +98,7 @@ const getUsersFromDb = async (
       OR: userSearchAbleFields.map((field) => ({
         [field]: {
           contains: params.searchTerm,
-          mode: "insensitive",
+          mode: 'insensitive',
         },
       })),
     });
@@ -90,7 +124,7 @@ const getUsersFromDb = async (
             [options.sortBy]: options.sortOrder,
           }
         : {
-            createdAt: "desc",
+            createdAt: 'desc',
           },
     select: {
       id: true,
@@ -107,7 +141,7 @@ const getUsersFromDb = async (
   });
 
   if (!result || result.length === 0) {
-    throw new ApiError(404, "No active users found");
+    throw new ApiError(404, 'No active users found');
   }
   return {
     meta: {
@@ -129,7 +163,7 @@ const updateProfile = async (user: IUser, payload: User) => {
   });
 
   if (!userInfo) {
-    throw new ApiError(404, "User not found");
+    throw new ApiError(404, 'User not found');
   }
 
   // Update the user profile with the new information
@@ -157,7 +191,7 @@ const updateProfile = async (user: IUser, payload: User) => {
   if (!result)
     throw new ApiError(
       httpStatus.INTERNAL_SERVER_ERROR,
-      "Failed to update user profile"
+      'Failed to update user profile'
     );
 
   return result;
@@ -171,7 +205,7 @@ const updateUserIntoDb = async (payload: IUser, id: string) => {
     },
   });
   if (!userInfo)
-    throw new ApiError(httpStatus.NOT_FOUND, "User not found with id: " + id);
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found with id: ' + id);
 
   const result = await prisma.user.update({
     where: {
@@ -192,7 +226,7 @@ const updateUserIntoDb = async (payload: IUser, id: string) => {
   if (!result)
     throw new ApiError(
       httpStatus.INTERNAL_SERVER_ERROR,
-      "Failed to update user profile"
+      'Failed to update user profile'
     );
 
   return result;

@@ -28,6 +28,43 @@ model User {
   @@map("Users")
 }
 
+model PointsLevel {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  points       Int
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@map("PointsLevels")
+}
+ model Milestone {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  points       Int       @default(0)
+  badge        String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@map("Milestones")
+}
+
+model Starrd{
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  category     String
+  subcategory  String
+  location     String
+  personalNote String
+  rating       Int
+  socialLink   String
+  uploadFiles  String[]
+  userId       String
+  shopId       String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@map("Starrds")
+}
 enum UserRole {
   ADMIN
   SUPER_ADMIN

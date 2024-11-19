@@ -1,17 +1,17 @@
 import { UserRole, UserStatus } from "@prisma/client";
 
 export interface IUser {
-  id?: string;
+  id: string;
   email: string;
-  firstName: string;
-  lastName: string;
+  name: string;
   password: string;
   role: UserRole;
+  points: number;
+  badge: string;
   fcmToken:string;
+  deviceToken:string;
   profession:string;
-  promoCode:string;
   status: UserStatus;
-  isDeleted:boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }
