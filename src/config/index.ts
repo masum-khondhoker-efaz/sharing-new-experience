@@ -1,3 +1,4 @@
+import { verify } from 'crypto';
 import dotenv from 'dotenv';
 import path from 'path';
 
@@ -13,6 +14,9 @@ export default {
         expires_in: process.env.EXPIRES_IN,
         refresh_token_secret: process.env.REFRESH_TOKEN_SECRET,
         refresh_token_expires_in: process.env.REFRESH_TOKEN_EXPIRES_IN,
+        verify_email_secret: process.env.VERIFY_EMAIL_SECRET,
+        verify_email_expires_in: process.env.VERIFY_EMAIL_EXPIRES_IN,
+        verify_email_link: process.env.VERIFY_EMAIL_LINK,
         reset_pass_secret: process.env.RESET_PASS_TOKEN,
         reset_pass_token_expires_in: process.env.RESET_PASS_TOKEN_EXPIRES_IN
     },

@@ -13,6 +13,13 @@ router.post(
   validateRequest(UserValidation.CreateUserValidationSchema),
   userController.createUser
 );
+
+//verify email
+router.get(
+  "/verify-email",
+   userController.verifyEmail
+  );
+
 // *!get all  user
 router.get("/", userController.getUsers);
 

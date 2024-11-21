@@ -142,29 +142,52 @@ const forgotPassword = async (payload: { email: string }) => {
     config.jwt.reset_pass_secret as Secret,
     config.jwt.reset_pass_token_expires_in as string
   );
-  console.log(resetPassToken);
   const resetPassLink =
     config.reset_pass_link + `?userId=${userData.id}&token=${resetPassToken}`;
 
   await emailSender(
     'Reset Your Password',
     userData.email,
-    `
-     <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-          <p>Dear ${userData.name},</p>
-          
-          <p>We received a request to reset your password. Click the button below to reset your password:</p>
-          
-          <a href="${resetPassLink}" style="text-decoration: none;">
-            <button style="background-color: #007BFF; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
-              Reset Password
-            </button>
+    
+     `<div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+    <table width="100%" style="border-collapse: collapse;">
+    <tr>
+      <td style="background-color: #007BFF; padding: 20px; text-align: center; color: #ffffff; border-radius: 10px 10px 0 0;">
+        <h2 style="margin: 0; font-size: 24px;">Reset Your Password</h2>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 20px;">
+        <p style="font-size: 16px; margin: 0;">Hello <strong>${userData.name}</strong>,</p>
+        <p style="font-size: 16px;">We received a request to reset your password. Please click the button below to proceed with resetting your password.</p>
+        
+        <div style="text-align: center; margin: 20px 0;">
+          <a href="${resetPassLink}" style="
+              background-color: #007BFF;
+              color: white;
+              padding: 12px 24px;
+              border-radius: 5px;
+              font-size: 16px;
+              font-weight: bold;
+              text-decoration: none;
+              display: inline-block;
+              cursor: pointer;">
+            Reset Password
           </a>
-          
-          <p>If you did not request a password reset, please ignore this email or contact support if you have any concerns.</p>
-          
-          <p>Thank you,<br>Dream 2 Drive</p>
-</div>
+        </div>
+        
+        <p style="font-size: 14px; color: #555;">If you did not request this change, please ignore this email. No further action is needed.</p>
+        
+        <p style="font-size: 16px; margin-top: 20px;">Thank you,<br>StarrdApp</p>
+      </td>
+    </tr>
+    <tr>
+      <td style="background-color: #f5f5f5; padding: 15px; text-align: center; font-size: 12px; color: #888; border-radius: 0 0 10px 10px;">
+        <p style="margin: 0;">&copy; ${new Date().getFullYear()} StarrdApp Team. All rights reserved.</p>
+      </td>
+    </tr>
+    </table>
+  </div>
 
       `
   );

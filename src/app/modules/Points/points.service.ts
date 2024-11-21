@@ -1,12 +1,4 @@
-import { Secret } from 'jsonwebtoken';
-import config from '../../../config';
-import { jwtHelpers } from '../../../helpars/jwtHelpers';
 import prisma from '../../../shared/prisma';
-import * as bcrypt from 'bcrypt';
-import ApiError from '../../../errors/ApiErrors';
-import { Prisma, User, UserRole, UserStatus } from "@prisma/client";
-import httpStatus from 'http-status';
-import admin from '../../../helpars/fireBaseAdmin';
 import { IPointsLevel } from './points.interface';
 
 

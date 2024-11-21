@@ -11,19 +11,22 @@ model User {
   id           String     @id @default(auto()) @map("_id") @db.ObjectId
   name         String
   email        String     @unique
-  phoneNumber  String?
+  phoneNumber  String     @unique
   profileImage String?
   password     String?
   fcmToken     String?
-  googleId     String?      @unique
-  facebookId   String?      @unique
+  googleId     String?    @unique
+  facebookId   String?    @unique
   deviceToken  String?
-  points       Int         @default(0)
+  points       Int        @default(0)
   badge        String?
   role         UserRole   @default(USER)
-  status       UserStatus @default(ACTIVE)
+  status       UserStatus @default(INACTIVE)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
+  starrd       Starrd[]
+  category     Category[]
+  subcategory  Subcategory[]
 
   @@map("Users")
 }
@@ -49,22 +52,55 @@ model PointsLevel {
 }
 
 model Starrd{
-  id           String     @id @default(auto()) @map("_id") @db.ObjectId
-  name         String
-  category     String
-  subcategory  String
-  location     String
-  personalNote String
-  rating       Int
-  socialLink   String
-  uploadFiles  String[]
-  userId       String
-  shopId       String
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  categoryId    String
+  subcategoryId String
+  personalNote  String
+  location      String
+  rating        Int
+  socialLink    String?
+  uploadFiles   String[]
+  userId        String     @db.ObjectId
+  shopId        String?     @db.ObjectId
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  user          User       @relation(fields: [userId], references: [id])
+  subcategory   Subcategory[]
+  category      Category[]
 
   @@map("Starrds")
 }
+
+model Category {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  userId        String     @db.ObjectId
+  starrdId      String?    @db.ObjectId
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  subcategoryId String?     @db.ObjectId
+  subcategory   Subcategory[]
+  user          User       @relation(fields: [userId], references: [id])
+  starrd        Starrd?    @relation(fields: [starrdId], references: [id])
+
+  @@map("Categories")
+}
+model Subcategory {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  categoryId   String     @db.ObjectId
+  userId       String     @db.ObjectId
+  starrdId     String?    @db.ObjectId
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  starrd       Starrd?    @relation(fields: [starrdId], references: [id])
+  category     Category   @relation(fields: [categoryId], references: [id])
+  user         User       @relation(fields: [userId], references: [id])
+
+  @@map("Subcategories")
+}
+
 enum UserRole {
   ADMIN
   SUPER_ADMIN

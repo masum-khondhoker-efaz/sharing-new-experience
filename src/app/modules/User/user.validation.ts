@@ -6,16 +6,21 @@ const CreateUserValidationSchema = z.object({
   email: z
     .string()
     .email("Invalid email address")
-    .min(1, "Email is required"),  // Ensure email is provided and is valid
+    .min(1, "Email is required"),  
 
   name: z
     .string()
-    .min(1, "Name is required"),  // Ensure name is non-empty
+    .min(1, "Name is required"),  
 
   password: z
     .string()
     .min(8, "Password must be at least 8 characters long")
     .nonempty("Password is required"),
+
+  phoneNumber: z
+  .string()
+  .min(9, "Phone number must be at least 10 characters long")
+  .nonempty("Phone number is required"),
 
 });
 

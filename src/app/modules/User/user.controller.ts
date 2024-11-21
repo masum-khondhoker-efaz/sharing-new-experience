@@ -60,9 +60,23 @@ const id = req.params.id;
   });
 });
 
+const verifyEmail = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.query.userId as string;
+  const token = req.query.token as string;
+  const result = await userService.verifyEmailFromDb(userId, token);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Email verified successfully!",
+    data: result,
+  });
+});
+
+
 export const userController = {
   createUser,
   getUsers,
   updateProfile,
-  updateUser
+  updateUser,
+  verifyEmail
 };
