@@ -6,6 +6,8 @@ import { PointRoutes } from "../modules/Points/points.routes";
 import { MilestoneRoutes } from "../modules/Milestone/milestone.route";
 import { StarrdRoutes } from "../modules/Starrd/starrd.route";
 import { CategoriesRoutes } from "../modules/Categories/categories.route";
+import { CompanyRoutes } from "../modules/Company/company.route";
+import { ServiceRoutes } from "../modules/Service/service.route";
 
 
 const router = express.Router();
@@ -34,6 +36,14 @@ const moduleRoutes = [
   {
     path: '/categories',
     route: CategoriesRoutes,
+  },
+  {
+    path: '/company',
+    route: CompanyRoutes,
+  },
+  {
+    path: '/service',
+    route: ServiceRoutes,
   },
 ];
 
