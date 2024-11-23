@@ -1,7 +1,7 @@
 export interface ICompany {
-  name: string;
-  description: string; 
-  images: string[]; 
+  companyName: string;
+  description: string;
+  uploadFiles: string[];
   openingHours: {
     Monday: string;
     Tuesday: string;
@@ -10,13 +10,13 @@ export interface ICompany {
     Friday: string;
     Saturday: string;
     Sunday: string;
-  }; 
-  websiteLink?: string; 
-  contact: string; 
-  email: string; 
+  };
+  websiteLink: string;
+  contact: string;
+  email: string;
   location: {
-    addressText: string; 
-    latitude: number; 
-    longitude: number; 
+    addressText: string;
+    latitude: number;
+    longitude: number;
   };
 }

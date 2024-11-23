@@ -1,19 +1,18 @@
 import { z } from 'zod';
 
 const starrdValidationSchema = z.object({
-    id: z.string().optional(),
     name: z.string(),
-    category: z.string(),
-    subcategory: z.string(),
-    location: z.string(),
     personalNote: z.string(),
-    rating: z.number().int().min(0).max(5),
-    socialLink: z.string().url().optional(),
+    companyName: z.string(),
+    subcategoryName: z.string(),
+    categoryId: z.string().optional(),
+    subcategoryId: z.string().optional(),
+    location: z.object({}).passthrough(),
+    rating: z.number().optional(),
+    socialLink: z.array(z.string().url()),
     uploadFiles: z.array(z.string()),
-    userId: z.string().optional(),
-    shopId: z.string().optional(),
-    createdAt: z.date().optional(),
-    updatedAt: z.date().optional()
+    userId: z.string(),
+    serviceId: z.string().optional(),
 });
 
-export const starrdValidation = { starrdValidationSchema, };
+export const starrdValidation = { starrdValidationSchema };

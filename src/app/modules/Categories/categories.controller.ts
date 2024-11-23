@@ -53,7 +53,8 @@ const deleteCategory = catchAsync(async (req: Request, res: Response) => {
 
 const createSubcategory = catchAsync(async (req: Request, res: Response) => {
   const user = req?.user as JwtPayload;
-  const result = await CategoriesServices.createSubcategoryIntoDb(user, req.body);
+  const categoryId = req.params.categoryId;
+  const result = await CategoriesServices.createSubcategoryIntoDb(user, req.body, categoryId);
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,

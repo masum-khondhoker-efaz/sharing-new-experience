@@ -8,6 +8,7 @@ import { StarrdRoutes } from "../modules/Starrd/starrd.route";
 import { CategoriesRoutes } from "../modules/Categories/categories.route";
 import { CompanyRoutes } from "../modules/Company/company.route";
 import { ServiceRoutes } from "../modules/Service/service.route";
+import { ReviewRoutes } from "../modules/Review/review.route";
 
 
 const router = express.Router();
@@ -45,6 +46,10 @@ const moduleRoutes = [
     path: '/service',
     route: ServiceRoutes,
   },
+  {
+    path: '/review',
+    route: ReviewRoutes
+  }
 ];
 
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

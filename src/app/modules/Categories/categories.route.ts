@@ -38,7 +38,7 @@ router.delete(
 
 // add subcategory route
 router.post(
-  '/create-subcategory',
+  '/create-subcategory/:categoryId',
   auth(UserRole.SUPER_ADMIN),
   validateRequest(categoryValidation.CategorySchema),
   CategoriesController.createSubcategory

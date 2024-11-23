@@ -1,15 +1,22 @@
+import { object } from "zod";
+
 export interface IStarrd {
-    id: string;
-    name: string;
-    categoryId: string;
-    subcategoryId: string;
-    personalNote: string;
-    location: string;
-    rating: number;
-    socialLink?: string;
-    uploadFiles: string[];
-    userId: string;
-    shopId?: string;
-    createdAt?: Date;
-    updatedAt?: Date;
+  name: string;
+  personalNote: string;
+  companyName: string;
+  categoryName: string;
+  subCategoryName: string;
+  categoryId?: string;
+  subCategoryId?: string;
+  companyId?: string;
+  location: {
+    addressText: string;
+    latitude: number;
+    longitude: number;
+  };
+  rating?: number;
+  websiteLink?: string;
+  socialLink: string[];
+  uploadFiles: string[];
+  serviceId?: string;
 }

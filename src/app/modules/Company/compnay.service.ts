@@ -1,7 +1,6 @@
 import { JwtPayload } from 'jsonwebtoken';
 import prisma from '../../../shared/prisma';
 import { ICompany } from './company.interface';
-import { use } from 'passport';
 
 
 // create company   

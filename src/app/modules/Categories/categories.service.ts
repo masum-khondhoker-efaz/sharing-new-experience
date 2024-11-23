@@ -38,20 +38,21 @@ const deleteCategoryFromDb = async (user: JwtPayload, categoryId: string) =>
 {
   const category = await prisma.category.delete({
     where: {
-      userId: user.id,
       id: categoryId,
+      userId: user.id,
     },
   });
   return category;
 }
 
 // create subcategory
-const createSubcategoryIntoDb = async (user: JwtPayload, payload: ISubcategory) => {
+const createSubcategoryIntoDb = async (user: JwtPayload, payload: ISubcategory, categoryId: string) => {
   
   const subcategory = await prisma.subcategory.create({
     data: {
       ...payload,
-      userId: user.id
+      userId: user.id,
+      categoryId: categoryId
     },
   });
   return subcategory;

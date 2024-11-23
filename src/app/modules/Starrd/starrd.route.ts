@@ -11,7 +11,7 @@ const router = express.Router();
 
 router.post(
     '/create-starrd',
-    auth(UserRole.SUPER_ADMIN),
+    auth(UserRole.USER),
     validateRequest(starrdValidation.starrdValidationSchema),
     StarrdController.createStarrd
 );

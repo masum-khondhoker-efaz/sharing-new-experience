@@ -9,7 +9,7 @@ import { JwtPayload } from 'jsonwebtoken';
 // create service
 const createService = catchAsync(async (req: Request, res: Response) => {
   const user = req?.user as JwtPayload;
-  const result = await CompanyServices.createCompanyIntoDb(user, req.body);
+  const result = await CompanyServices.createServiceIntoDb(user, req.body);
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,
@@ -20,7 +20,7 @@ const createService = catchAsync(async (req: Request, res: Response) => {
 
 // get service
 const getService = catchAsync(async (req: Request, res: Response) => {
-  const result = await CompanyServices.getCompanyFromDb();
+  const result = await CompanyServices.getServiceFromDb();
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
@@ -33,7 +33,11 @@ const getService = catchAsync(async (req: Request, res: Response) => {
 const updateService = catchAsync(async (req: Request, res: Response) => {
   const user = req?.user as JwtPayload;
   const companyId = req.params.serviceId;
-  const result = await CompanyServices.updateCompanyIntoDb(user, req.body, companyId);
+  const result = await CompanyServices.updateServiceIntoDb(
+    user,
+    req.body,
+    companyId
+  );
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
@@ -46,7 +50,7 @@ const updateService = catchAsync(async (req: Request, res: Response) => {
 const deleteService = catchAsync(async (req: Request, res: Response) => {
   const user = req?.user as JwtPayload;
   const companyId = req.params.serviceId;
-  const result = await CompanyServices.deleteCompanyFromDb(user, companyId);
+  const result = await CompanyServices.deleteServiceFromDb(user, companyId);
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
