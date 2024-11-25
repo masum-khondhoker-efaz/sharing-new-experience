@@ -28,6 +28,19 @@ const getStarrd = catchAsync(async (req: Request, res: Response) => {
     });
 })
 
+const getStarrdById = catchAsync(async (req: Request, res: Response) => {
+    const user = req?.user as JwtPayload;
+    const starrdId = req.params.starrdId;
+    const result = await StarrdServices.getStarrdByIdFromDb(user, starrdId);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: 'Starrd retrieved successfully',
+        data: result,
+    });
+});
+
+
 const updateStarrd = catchAsync(async (req: Request, res: Response) => {
     const user = req?.user as JwtPayload;
     const starrdId = req.params.starrdId;
@@ -58,4 +71,5 @@ export const StarrdController = {
     getStarrd,
     updateStarrd,
     deleteStarrd,
+    getStarrdById
 };

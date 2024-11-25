@@ -11,9 +11,9 @@ const OpeningHoursSchema = z.object({
 
 // Define the main Company schema
 const companyValidationSchema = z.object({
-  name: z.string(),
+  companyName: z.string(),
   description: z.string(),
-  images: z.array(z.string()),
+  uploadFiles: z.array(z.string()),
   openingHours: OpeningHoursSchema, // Reference the openingHours schema
   websiteLink: z.string().optional(),
   contact: z.string(),

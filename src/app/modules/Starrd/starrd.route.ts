@@ -22,10 +22,16 @@ router.get(
   StarrdController.getStarrd
 );
 
+router.get(
+  '/get-starrd/:starrdId',
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.USER),
+  StarrdController.getStarrdById
+);
+
 
 router.put(
   '/update-starrd/:starrdId',
-  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.USER),
   validateRequest(starrdValidation.starrdValidationSchema),
   StarrdController.updateStarrd
 );

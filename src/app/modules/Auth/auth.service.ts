@@ -69,7 +69,6 @@ const getMyProfile = async (userToken: string) => {
     userToken,
     config.jwt.jwt_secret!
   );
-
   const userProfile = await prisma.user.findUnique({
     where: {
       id: decodedToken.id,
@@ -80,16 +79,22 @@ const getMyProfile = async (userToken: string) => {
       email: true,
       profileImage: true,
       phoneNumber: true,
-      createdAt: true,
-      updatedAt: true,
+      serviceViewed: true,
     },
   });
-
-  return userProfile;
+  const starrdDetails = await Promise.all(
+    Array.isArray(userProfile?.serviceViewed) ? userProfile.serviceViewed.map(async (viewed: any) => {
+      const service = await prisma.starrd.findUnique({
+        where: { id: viewed.id },
+      });
+      return service;
+    }) : []
+  );
+  return {userProfile, starrdDetails};
 };
 
-// change password
 
+// change password
 const changePassword = async (
   userToken: string,
   newPassword: string,
@@ -319,6 +324,32 @@ const resetPassword = async (token: string, payload: { password: string }) => {
 //   return { token: accessToken };
 // };
 
+const profileImageUploadIntoDb = async (userToken: string, payload: IUser) => {
+  const decodedToken = jwtHelpers.verifyToken(
+    userToken,
+    config.jwt.jwt_secret!
+  );
+  const user = await prisma.user.findUnique({
+    where: {
+      id: decodedToken.id,
+    },
+  });
+
+  if (!user) {
+    throw new ApiError(404, 'User not found');
+  }
+
+  const updatedUser = await prisma.user.update({
+    where: {
+      id: decodedToken.id,
+    },
+    data: payload
+  });
+
+  return updatedUser;
+};
+
+
 
 export const AuthServices = {
   loginUser,
@@ -326,6 +357,7 @@ export const AuthServices = {
   changePassword,
   forgotPassword,
   resetPassword,
+  profileImageUploadIntoDb,
   // loginWithGoogleIntoDb,
   // loginWithFacebookIntoDb,
 };

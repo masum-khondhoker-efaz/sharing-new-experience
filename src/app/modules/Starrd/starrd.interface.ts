@@ -1,4 +1,3 @@
-import { object } from "zod";
 
 export interface IStarrd {
   name: string;
@@ -9,13 +8,13 @@ export interface IStarrd {
   categoryId?: string;
   subCategoryId?: string;
   companyId?: string;
-  location: {
+  location:{
     addressText: string;
     latitude: number;
     longitude: number;
   };
   rating?: number;
-  websiteLink?: string;
+  websiteLink: string;
   socialLink: string[];
   uploadFiles: string[];
   serviceId?: string;

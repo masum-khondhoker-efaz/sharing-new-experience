@@ -20,7 +20,7 @@ router.post("/logout", AuthController.logoutUser);
 
 router.get(
   "/profile",
-  auth(UserRole.ADMIN, UserRole.USER),
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.USER),
   AuthController.getMyProfile
 );
 
@@ -41,6 +41,13 @@ router.post(
   '/reset-password',
   AuthController.resetPassword
 )
+
+router.post(
+  '/profile-image-upload',
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.USER),
+  validateRequest(authValidation.profileImageValidationSchema),
+  AuthController.profileImageUpload
+);
 
 // router.post(
 //   '/login-with-google',

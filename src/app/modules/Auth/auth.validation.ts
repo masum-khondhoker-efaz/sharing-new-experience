@@ -5,6 +5,13 @@ const changePasswordValidationSchema = z.object({
   newPassword: z.string().min(8),
 });
 
-export const authValidation={
-    changePasswordValidationSchema
-}
+const profileImageValidationSchema = z.object({
+  profileImage: z.string().url().optional(),
+});
+
+export const authValidation = {
+  changePasswordValidationSchema,
+  profileImageValidationSchema,
+};
+
+

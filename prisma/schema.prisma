@@ -20,7 +20,7 @@ model User {
   deviceToken      String?
   points           Int        @default(0)
   badge            String?
-  serviceViewed    Json[]
+  serviceViewed    Json?
   role             UserRole   @default(USER)
   status           UserStatus @default(INACTIVE)
   createdAt        DateTime   @default(now())
@@ -71,7 +71,7 @@ model Starrd {
   websiteLink       String
   socialLink        String[]
   uploadFiles       String[]
-  userId            String      @db.ObjectId
+  userId            String        @db.ObjectId
   serviceId         String?      @db.ObjectId
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt

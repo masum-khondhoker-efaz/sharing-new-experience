@@ -113,6 +113,19 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
 //   });
 // });
 
+
+const profileImageUpload = catchAsync(async (req: Request, res: Response) => {
+  const userToken = req.headers.authorization;
+  const result = await AuthServices.profileImageUploadIntoDb(userToken as string, req.body);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Profile image uploaded successfully",
+    data: result,
+  });
+}
+);
+
 export const AuthController = {
   loginUser,
   logoutUser,
@@ -120,6 +133,7 @@ export const AuthController = {
   changePassword,
   forgotPassword,
   resetPassword,
+  profileImageUpload,
   // loginWithGoogle,
   // loginWithFacebook
 };
