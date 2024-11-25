@@ -18,7 +18,7 @@ router.post(
 // get service
 router.get(
   '/get-service',
-  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.USER),
+  auth(),
   ServiceController.getService
 );
 

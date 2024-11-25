@@ -18,6 +18,7 @@ router.post(
 
 // get category route
 router.get('/get-categories',
+   auth(),
      CategoriesController.getCategory
 );
 
