@@ -1,7 +1,11 @@
 export interface ICompany {
   companyName: string;
   description: string;
-  uploadFiles: string[];
+  category: object;
+  uploadFiles: {
+    imageName: string;
+    imageUrl: string;
+  }[];
   openingHours: {
     Monday: string;
     Tuesday: string;

@@ -4,17 +4,17 @@ import { IReview } from './review.interface';
 
 // add review into db
 const addReviewIntoDb = async (user: JwtPayload, payload: IReview) => {
-  if (payload.serviceId) {
-    const service = await prisma.service.findUnique({
+  if (payload.starrdId) {
+    const starrd = await prisma.starrd.findUnique({
       where: {
-        id: payload.serviceId,
+        id: payload.starrdId,
       },
     });
-    if (!service) {
-      throw new Error('Service Id is wrong');
+    if (!starrd) {
+      throw new Error('Starrd Id is wrong');
     }
   } else {
-    throw new Error('Service Id is required');
+    throw new Error('Starrd Id is required');
   }
   const review = await prisma.review.create({
     data: {
@@ -22,14 +22,14 @@ const addReviewIntoDb = async (user: JwtPayload, payload: IReview) => {
       userId: user.id,
     },
   });
-   await prisma.service.update({
+   await prisma.starrd.update({
      data: {
        reviewIds: {
          push: review.id,
        },
      },
      where: {
-       id: review.serviceId,
+       id: review.starrdId,
      },
    });
   return review;
@@ -46,14 +46,48 @@ const getReviewFromDb = async (user: JwtPayload) => {
 };
 
 // get all reviews from db
-const getAllReviewsFromDb = async (serviceId: string) => {
+const getAllReviewsFromDb = async (starrdId: string) => {
   const reviews = await prisma.review.findMany({
     where: {
-      serviceId: serviceId,
+      starrdId: starrdId,
+      
     },
   });
   return reviews;
 };
+
+// get review by company id
+const getReviewByCompanyIdFromDb = async (companyId: string) => {
+  const reviews = await prisma.review.findMany({
+    where: {
+      companyId: companyId,
+    },
+    select: {
+      rating: true,
+      comment: true,
+      images: true,
+      userId: true,
+      starrdId: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+
+  const statistics = reviews.reduce(
+    (acc: { totalReviews: number; [key: number]: number; totalRating: number }, review: { rating: number }) => {
+      acc.totalReviews += 1;
+      acc[review.rating] += 1;
+      acc.totalRating += review.rating;
+      return acc;
+    },
+    { totalReviews: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, totalRating: 0 }
+  );
+
+  const averageRating = statistics.totalReviews ? (statistics.totalRating / statistics.totalReviews) : 0;
+
+  return { averageRating, statistics, reviews };
+};
+
 
 // update review into db
 const updateReviewIntoDb = async (
@@ -87,6 +121,7 @@ export const ReviewServices = {
   addReviewIntoDb,
   getReviewFromDb,
   getAllReviewsFromDb,
+  getReviewByCompanyIdFromDb,
   updateReviewIntoDb,
   deleteReviewFromDb,
 };

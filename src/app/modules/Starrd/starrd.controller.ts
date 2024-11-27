@@ -19,7 +19,7 @@ const createStarrd = catchAsync(async (req: Request, res: Response) => {
 
 const getStarrd = catchAsync(async (req: Request, res: Response) => {
     const user = req?.user as JwtPayload;
-    const result = await StarrdServices.getStarrdFromDb(user);
+    const result = await StarrdServices.getStarrdFromDb();
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
@@ -32,6 +32,18 @@ const getStarrdById = catchAsync(async (req: Request, res: Response) => {
     const user = req?.user as JwtPayload;
     const starrdId = req.params.starrdId;
     const result = await StarrdServices.getStarrdByIdFromDb(user, starrdId);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: 'Starrd retrieved successfully',
+        data: result,
+    });
+});
+
+const getStarrdByCompany = catchAsync(async (req: Request, res: Response) => {
+    const user = req?.user as JwtPayload;
+    const companyId = req.params.companyId;
+    const result = await StarrdServices.getStarrdByCompanyFromDb(user, companyId);
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
@@ -66,10 +78,24 @@ const deleteStarrd = catchAsync(async (req: Request, res: Response) => {
     });
 })
 
+const getStarrdByFavourite = async (req: Request, res: Response) => {
+    const result = await StarrdServices.getStarrdByFavouriteFromDb();
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: 'Starrd retrieved successfully',
+        data: result,
+    });
+}
+
+
 export const StarrdController = {
     createStarrd,
     getStarrd,
     updateStarrd,
     deleteStarrd,
-    getStarrdById
+    getStarrdById,
+    getStarrdByCompany,
+    getStarrdByFavourite,
+    
 };

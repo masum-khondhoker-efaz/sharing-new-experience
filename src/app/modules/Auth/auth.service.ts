@@ -9,6 +9,7 @@ import { Prisma, User, UserRole, UserStatus } from "@prisma/client";
 import httpStatus from 'http-status';
 import admin from '../../../helpars/fireBaseAdmin';
 import { IUser } from './auth.interface';
+import { ObjectId } from 'mongodb';
 
 // user login
 const loginUser = async (payload: {
@@ -69,6 +70,7 @@ const getMyProfile = async (userToken: string) => {
     userToken,
     config.jwt.jwt_secret!
   );
+
   const userProfile = await prisma.user.findUnique({
     where: {
       id: decodedToken.id,
@@ -82,16 +84,57 @@ const getMyProfile = async (userToken: string) => {
       serviceViewed: true,
     },
   });
+
   const starrdDetails = await Promise.all(
-    Array.isArray(userProfile?.serviceViewed) ? userProfile.serviceViewed.map(async (viewed: any) => {
-      const service = await prisma.starrd.findUnique({
-        where: { id: viewed.id },
-      });
-      return service;
-    }) : []
+    Array.isArray(userProfile?.serviceViewed)
+      ? userProfile.serviceViewed.slice(0, 3).map(async (viewed: any) => {
+          const service = await prisma.starrd.findUnique({
+            where: { id: viewed.id },
+            select: {
+              id: true, // Include id field here
+              uploadFiles: true,
+              name: true,
+              location: true,
+              createdAt: true,
+              updatedAt: true,
+            },
+          });
+
+          // Check if service exists before returning data
+          if (service) {
+            return {
+              id: service.id, 
+              uploadFiles: service.uploadFiles || [],
+              name: service.name,
+              location: service.location,
+              createdAt: service.createdAt,
+              updatedAt: service.updatedAt,
+            };
+          }
+
+          return null;
+        })
+      : []
   );
-  return {userProfile, starrdDetails};
+
+  if (userProfile) {
+    return {
+      success: true,
+      message: 'User profile retrieved successfully',
+      data: {
+        id: userProfile.id,
+        name: userProfile.name,
+        email: userProfile.email,
+        profileImage: userProfile.profileImage || 'https://placehold.co/400', // fallback if profile image is not available
+        phoneNumber: userProfile.phoneNumber,
+        serviceViewed: starrdDetails.filter((detail) => detail !== null), // Filter out any null values
+      },
+    };
+  }
+
+  return { success: false, message: 'User not found' };
 };
+
 
 
 // change password

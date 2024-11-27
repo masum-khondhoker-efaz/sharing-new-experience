@@ -14,6 +14,7 @@ export interface IStarrd {
     longitude: number;
   };
   rating?: number;
+  reviewIds?: string[];
   websiteLink: string;
   socialLink: string[];
   uploadFiles: string[];

@@ -1,5 +1,8 @@
 export interface IReview {
     comment: string;
     rating: number;
-    serviceId: string;
+    starrdId: string;
+    images: string[];
+    companyId: string;
+    serviceId?: string;
 }

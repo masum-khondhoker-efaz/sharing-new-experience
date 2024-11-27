@@ -20,6 +20,18 @@ const getCompanyFromDb = async () => {
   return company;
 };
 
+// get company by id
+const getCompanyByIdFromDb = async (companyId: string) =>
+{
+  const company = await prisma.company.findUnique({
+    where: {
+      id: companyId,
+    },
+  });
+  return company;
+}
+
+
 // update company
 const updateCompanyIntoDb = async (user: JwtPayload, payload: ICompany, companyId: string) => {
   const company = await prisma.company.update({
@@ -50,4 +62,5 @@ export const CompanyServices = {
   getCompanyFromDb,
   updateCompanyIntoDb,
   deleteCompanyFromDb,
+  getCompanyByIdFromDb
 };

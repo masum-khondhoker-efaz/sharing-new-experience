@@ -187,28 +187,26 @@ const getUsersFromDb = async (
 };
 
 // update profile by user won profile uisng token or email and id
-const updateProfile = async (user: IUser, payload: User) => {
+const updateProfile = async (user: JwtPayload, payload: IUser) => {
   const userInfo = await prisma.user.findUnique({
     where: {
-      email: user.email,
       id: user.id,
     },
   });
 
   if (!userInfo) {
-    throw new ApiError(404, 'User not found');
+    throw new ApiError(404, 'User not found');  
   }
 
   // Update the user profile with the new information
   const result = await prisma.user.update({
     where: {
-      email: userInfo.email,
+      id: userInfo.id,
     },
     data: {
-      name: payload.name || userInfo.name,
-      email: payload.email || userInfo.email,
-      profileImage: payload.profileImage || userInfo.profileImage,
-      phoneNumber: payload.phoneNumber || userInfo.phoneNumber,
+      name: payload.name,
+      profileImage: payload.profileImage,
+      phoneNumber: payload.phoneNumber,
     },
     select: {
       id: true,

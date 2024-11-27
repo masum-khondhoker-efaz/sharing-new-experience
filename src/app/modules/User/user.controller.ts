@@ -5,6 +5,7 @@ import { userService } from "./user.services";
 import { Request, Response } from "express";
 import pick from "../../../shared/pick";
 import { userFilterableFields } from "./user.costant";
+import { JwtPayload } from "jsonwebtoken";
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
   const result = await userService.createUserIntoDb(req.body);
@@ -35,8 +36,8 @@ const getUsers = catchAsync(async (req: Request, res: Response) => {
 
 
 // get all user form db
-const updateProfile = catchAsync(async (req: Request & {user?:any}, res: Response) => {
-  const user = req?.user;
+const updateProfile = catchAsync(async (req: Request, res: Response) => {
+  const user = req?.user as JwtPayload;
 
   const result = await userService.updateProfile(user, req.body);
   sendResponse(res, {
@@ -49,16 +50,16 @@ const updateProfile = catchAsync(async (req: Request & {user?:any}, res: Respons
 
 
 // *! update user role and account status
-const updateUser = catchAsync(async (req: Request, res: Response) => {
-const id = req.params.id;
-  const result = await userService.updateUserIntoDb( req.body,id);
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "User updated successfully!",
-    data: result,
-  });
-});
+// const updateUser = catchAsync(async (req: Request, res: Response) => {
+// const user = req?.user as JwtPayload;
+//   const result = await userService.updateUserIntoDb(user, req.body);
+//   sendResponse(res, {
+//     statusCode: httpStatus.OK,
+//     success: true,
+//     message: "User updated successfully!",
+//     data: result,
+//   });
+// });
 
 const verifyEmail = catchAsync(async (req: Request, res: Response) => {
   const userId = req.query.userId as string;
@@ -77,6 +78,6 @@ export const userController = {
   createUser,
   getUsers,
   updateProfile,
-  updateUser,
+  // updateUser,
   verifyEmail
 };

@@ -31,12 +31,24 @@ const getReview = catchAsync(async (req: Request, res: Response) => {
 
 // get all reviews controller
 const getAllReviews = catchAsync(async (req: Request, res: Response) => {
-  const serviceId = req.params.serviceId;
-  const result = await ReviewServices.getAllReviewsFromDb(serviceId);
+  const starrdId = req.params.starrdId;
+
+  const result = await ReviewServices.getAllReviewsFromDb(starrdId);
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
     message: 'All reviews retrieved successfully',
+    data: result,
+  });
+});
+//get review by company id
+const getReviewByCompanyId = catchAsync(async (req: Request, res: Response) => {
+  const companyId = req.params.companyId;
+  const result = await ReviewServices.getReviewByCompanyIdFromDb(companyId);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Review retrieved successfully',
     data: result,
   });
 });
@@ -71,6 +83,7 @@ export const ReviewController = {
   addReview,
   getReview,
   getAllReviews,
+  getReviewByCompanyId,
   updateReview,
   deleteReview,
 };

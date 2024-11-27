@@ -1,9 +1,9 @@
 import { UserRole, UserStatus } from "@prisma/client";
 
 export interface IUser {
-  id: string;
   email: string;
   name: string;
+  profileImage?: string;
   phoneNumber: string;
   password: string;
   role: UserRole;

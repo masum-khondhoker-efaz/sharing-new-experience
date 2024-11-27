@@ -18,20 +18,32 @@ router.post(
 
 router.get(
   '/get-starrd',
-  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.USER),
+  auth(),
   StarrdController.getStarrd
 );
 
 router.get(
-  '/get-starrd/:starrdId',
+  '/get-favourite-starrd',
   auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.USER),
+  StarrdController.getStarrdByFavourite
+);
+
+router.get(
+  '/get-starrd/:starrdId',
+  auth(),
   StarrdController.getStarrdById
+);
+
+router.get(
+  '/get-starrd-by-company/:companyId',
+  auth(UserRole.USER),
+  StarrdController.getStarrdByCompany
 );
 
 
 router.put(
   '/update-starrd/:starrdId',
-  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.USER),
+  auth(),
   validateRequest(starrdValidation.starrdValidationSchema),
   StarrdController.updateStarrd
 );

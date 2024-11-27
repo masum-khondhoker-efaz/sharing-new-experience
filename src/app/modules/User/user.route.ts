@@ -25,13 +25,13 @@ router.get("/", userController.getUsers);
 
 // *!profile user
 router.put(
-  "/profile",
+  "/profile-update",
   validateRequest(UserValidation.userUpdateSchema),
-  auth(UserRole.ADMIN, UserRole.USER),
+  auth(),
   userController.updateProfile
 );
 
 // *!update  user
-router.put("/:id", userController.updateUser);
+// router.put("/:id", userController.updateUser);
 
 export const userRoutes = router;

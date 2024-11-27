@@ -2,7 +2,7 @@ import { z } from "zod";
 
 
 
-const CreateUserValidationSchema = z.object({
+const  CreateUserValidationSchema = z.object({
   email: z
     .string()
     .email("Invalid email address")
@@ -10,7 +10,7 @@ const CreateUserValidationSchema = z.object({
 
   name: z
     .string()
-    .min(1, "Name is required"),  
+    .min(1, "Name is required"),
 
   password: z
     .string()
@@ -36,10 +36,9 @@ const UserLoginValidationSchema = z.object({
 });
 
 const userUpdateSchema = z.object({
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
-  promoCode: z.string().optional(),
-  profession: z.string().optional(),
+  name: z.string().optional(),
+  profileImage: z.string().url().optional(),
+  phoneNumber: z.string().optional(), 
 });
 
 export const UserValidation = {

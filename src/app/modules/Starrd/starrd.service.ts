@@ -1,3 +1,4 @@
+import ApiError from '../../../errors/ApiErrors';
 import prisma from '../../../shared/prisma';
 import { IStarrd } from './starrd.interface';
 import { JwtPayload } from 'jsonwebtoken';
@@ -17,13 +18,13 @@ const createStarrdIntoDb = async (user: JwtPayload, payload: IStarrd) => {
     if (!starrd) throw new Error('Failed to create starrd');
 
     if (starrd.companyName) {
-      const company = await prisma.company.findMany({
+      let company = await prisma.company.findUnique({
         where: {
           companyName: starrd.companyName,
         },
       });
-      if (!company.length) {
-         await prisma.company.create({
+      if (!company) {
+        company = await prisma.company.create({
           data: {
             companyName: starrd.companyName,
             uploadFiles: starrd.uploadFiles,
@@ -33,8 +34,15 @@ const createStarrdIntoDb = async (user: JwtPayload, payload: IStarrd) => {
             userId: user.id,
           },
         });
-        
       }
+      await prisma.starrd.update({
+        where: {
+          id: starrd.id,
+        },
+        data: {
+          companyId: company.id,
+        },
+      });
     }
 
     if (starrd.categoryName) {
@@ -43,16 +51,23 @@ const createStarrdIntoDb = async (user: JwtPayload, payload: IStarrd) => {
           categoryName: starrd.categoryName,
         },
       });
-      console.log('object', category);
-
+      await prisma.starrd.update({
+        where: {
+          id: starrd.id,
+        },
+        data: {
+          categoryId: category.id,
+        },
+      });
+      
       if (starrd.subCategoryName) {
-        const subcategory = await prisma.subcategory.findMany({
+        let subcategory = await prisma.subcategory.findUnique({
           where: {
             subCategoryName: starrd.subCategoryName,
           },
         });
-        if (!subcategory.length) {
-          await prisma.subcategory.create({
+        if (!subcategory) {
+          subcategory = await prisma.subcategory.create({
             data: {
               subCategoryName: starrd.subCategoryName,
               categoryId: category.id,
@@ -60,8 +75,39 @@ const createStarrdIntoDb = async (user: JwtPayload, payload: IStarrd) => {
             },
           });
         }
+        await prisma.starrd.update({
+          where: {
+            id: starrd.id,
+          },
+          data: {
+            subCategoryId: subcategory.id,
+          },
+        });
       }
     }
+    // Fetch points from PointsLevel where name is "Join into app"
+  const point = await prisma.pointsLevel.findFirst({
+    where: {
+      OR: [
+        { name: 'Add a new item or product' },
+        { name: 'Share a place or product' },
+      ],
+    },
+    select: {
+      points: true,
+    },
+  });
+
+  // If pointsLevel for "Join into app" not found, throw error
+  if (!point) {
+    throw new ApiError(404, "Points level 'Join into app' not found");
+  }
+
+    // Increment points for the user
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { points: { increment: point.points } },
+    });
 
     return starrd;
   });
@@ -70,12 +116,8 @@ const createStarrdIntoDb = async (user: JwtPayload, payload: IStarrd) => {
 };
 
 // get starrd
-const getStarrdFromDb = async (user: JwtPayload) => {
-    const starrd = await prisma.starrd.findMany({
-        where: {
-            userId: user.id,
-        },
-    });
+const getStarrdFromDb = async () => {
+    const starrd = await prisma.starrd.findMany();
     if (!starrd) throw new Error('Failed to get starrd');
     return starrd;
 };
@@ -106,6 +148,8 @@ const getStarrdFromDb = async (user: JwtPayload) => {
 //   if (!starrd) throw new Error('Failed to get starrd');
 //   return starrd;
 // };
+
+
 
 const getStarrdByIdFromDb = async (user: JwtPayload, starrdId: string) => {
   if (!user?.id || !starrdId) {
@@ -182,9 +226,16 @@ const getStarrdByIdFromDb = async (user: JwtPayload, starrdId: string) => {
   return result;
 };
 
+// get starrd by company
+ const getStarrdByCompanyFromDb = async (user: JwtPayload,companyId: string) => {
+  const starrd = await prisma.starrd.findMany({
+    where: {
+      companyId: companyId,
+    },
+  });
+  return starrd;
+}
 
-
- 
 
 // update starrd
 const updateStarrdIntoDb = async (user: JwtPayload, payload: IStarrd, starrdId: string) => {
@@ -211,10 +262,43 @@ const deleteStarrdFromDb = async (user: JwtPayload, starrdId: string) => {
   return starrd;
 };
 
+
+// Get Starrd by Favourite
+// const getStarrdByFavouriteFromDb = async () => {
+//   const starrd = await prisma.starrd.findMany();
+//   if (!starrd) throw new Error('Failed to get starrd');
+//   return starrd;
+// };
+
+// Get top 10 Starrd by highest reviews
+const getStarrdByFavouriteFromDb = async () => {
+  const starrd = await prisma.starrd.findMany({
+    include: {
+      _count: {
+        select: {
+          reviews: true, 
+        },
+      },
+    },
+    orderBy: {
+      reviews: {
+        _count: 'desc',
+      },
+    },
+    take: 5,
+  });
+
+  return starrd;
+};
+
+
+
 export const StarrdServices = {
   createStarrdIntoDb,
   getStarrdFromDb,
   updateStarrdIntoDb,
   deleteStarrdFromDb,
-  getStarrdByIdFromDb
+  getStarrdByIdFromDb,
+  getStarrdByFavouriteFromDb,
+  getStarrdByCompanyFromDb,
 };

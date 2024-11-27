@@ -21,6 +21,12 @@ router.get(
   CompanyController.getCompany
 );
 
+router.get(
+  '/get-company-specific/:companyId',
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.USER),
+  CompanyController.getCompanyById
+);
+
 router.put(
     '/update-company/:companyId',
     auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.USER),

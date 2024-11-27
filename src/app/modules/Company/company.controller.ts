@@ -29,6 +29,18 @@ const getCompany = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+//get company by id
+const getCompanyById = catchAsync(async (req: Request, res: Response) => {
+  const companyId = req.params.companyId;
+  const result = await CompanyServices.getCompanyByIdFromDb(companyId);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Company retrieved successfully',
+    data: result,
+  });
+});
+
 // update company
 const updateCompany = catchAsync(async (req: Request, res: Response) => {
   const user = req?.user as JwtPayload;
@@ -60,4 +72,5 @@ export const CompanyController = {
   getCompany,
   updateCompany,
   deleteCompany,
+  getCompanyById,
 };

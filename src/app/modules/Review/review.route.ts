@@ -1,8 +1,11 @@
 import express from 'express';
 import validateRequest from '../../middlewares/validateRequest';
 import auth from '../../middlewares/auth';
-import { UserRole } from '@prisma/client';
-
+enum UserRole {
+  SUPER_ADMIN = 'SUPER_ADMIN',
+  ADMIN = 'ADMIN',
+  USER = 'USER',
+}
 import { ReviewController } from './review.controller';
 import { reviewValidation } from './review.validation';
 
@@ -11,23 +14,31 @@ const router = express.Router();
 // add review route
 router.post(
   '/create-review',
-  auth(UserRole.USER),
   validateRequest(reviewValidation.ReviewSchema),
+  auth(UserRole.USER),
   ReviewController.addReview
 );
 
 // get review route
 router.get(
   '/get-review',
-  auth(UserRole.USER),
+  auth(),
   ReviewController.getReview
 );
 
 // get all reviews route
 router.get(
-    '/get-all-reviews/:serviceId',
+    '/get-all-reviews/:starrdId',
      auth(UserRole.USER),
      ReviewController.getAllReviews);
+
+// get review by company id
+router.get(
+  '/get-review/:companyId',
+  auth(UserRole.USER),
+  ReviewController.getReviewByCompanyId
+);
+
 
 // update review route
 router.put(
