@@ -18,4 +18,11 @@ const starrdValidationSchema = z.object({
     
 });
 
-export const starrdValidation = { starrdValidationSchema };
+const starrdFavoriteValidation = z.object({ 
+    favorite: z.boolean().optional(),
+});
+
+export const starrdValidation = { 
+    starrdValidationSchema,
+    starrdFavoriteValidation
+};

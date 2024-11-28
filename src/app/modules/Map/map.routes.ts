@@ -10,8 +10,8 @@ const router = express.Router();
 
 // get map details route
 router.get(
-  '/get-all-places/:latitude/:longitude',
-  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.USER),
+  '/get-all-places',
+  auth(),
   MapController.getAllPlaces
 );
 

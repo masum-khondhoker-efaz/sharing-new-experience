@@ -236,6 +236,19 @@ const getStarrdByIdFromDb = async (user: JwtPayload, starrdId: string) => {
   return starrd;
 }
 
+const updateFavouriteStarrdIntoDb= async (user: JwtPayload, starrdId: string) => {
+  const starrd = await prisma.starrd.update({
+    where: {
+      userId: user.id,
+      id: starrdId,
+    },
+    data: {
+      favorite: true,
+    },
+  });
+  return starrd;
+}
+
 
 // update starrd
 const updateStarrdIntoDb = async (user: JwtPayload, payload: IStarrd, starrdId: string) => {
@@ -276,7 +289,7 @@ const getStarrdByFavouriteFromDb = async () => {
     include: {
       _count: {
         select: {
-          reviews: true, 
+          reviews: true,
         },
       },
     },
@@ -288,9 +301,27 @@ const getStarrdByFavouriteFromDb = async () => {
     take: 5,
   });
 
-  return starrd;
-};
+  const starrdWithRatings = await Promise.all(
+    starrd.map(async (s) => {
+      const avgRating = await prisma.review.aggregate({
+        _avg: {
+          rating: true,
+        },
+        where: {
+          starrdId: s.id,
+        },
+      });
 
+      return {
+       ...s,
+        _count: s._count.reviews,
+        avgRating: avgRating._avg.rating,
+      };
+    })
+  );
+
+  return starrdWithRatings;
+};
 
 
 export const StarrdServices = {
@@ -301,4 +332,5 @@ export const StarrdServices = {
   getStarrdByIdFromDb,
   getStarrdByFavouriteFromDb,
   getStarrdByCompanyFromDb,
+  updateFavouriteStarrdIntoDb,
 };

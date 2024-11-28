@@ -68,19 +68,20 @@ model Starrd {
   companyId         String?         @db.ObjectId 
   location          Json
   rating            Float?
+  favorite          Boolean?       @default(false)
   websiteLink       String
   socialLink        String[]
   uploadFiles       String[]
-  reviewIds         String[]        @db.ObjectId
-  userId            String        @db.ObjectId
-  serviceId         String?      @db.ObjectId
-  createdAt         DateTime    @default(now())
-  updatedAt         DateTime    @updatedAt
-  user              User        @relation(fields: [userId], references: [id])
-  service           Service?     @relation(fields: [serviceId], references: [id])
-  subcategory       Subcategory?  @relation(fields: [subCategoryId], references: [id])
-  category          Category?     @relation(fields: [categoryId], references: [id])
-  company           Company?      @relation(fields: [companyId], references: [id])
+  reviewIds         String[]       @db.ObjectId
+  userId            String         @db.ObjectId
+  serviceId         String?        @db.ObjectId
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  user              User           @relation(fields: [userId], references: [id])
+  service           Service?       @relation(fields: [serviceId], references: [id])
+  subcategory       Subcategory?   @relation(fields: [subCategoryId], references: [id])
+  category          Category?      @relation(fields: [categoryId], references: [id])
+  company           Company?       @relation(fields: [companyId], references: [id])
   reviews           Review[]
   @@map("Starrds")
 }
@@ -177,6 +178,7 @@ model Review {
 
   @@map("Reviews")
 }
+
 
 enum UserRole {
   ADMIN

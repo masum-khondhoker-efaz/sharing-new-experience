@@ -40,6 +40,12 @@ router.get(
   StarrdController.getStarrdByCompany
 );
 
+router.patch(
+  '/add-favourite/:starrdId',
+  auth(),
+  validateRequest(starrdValidation.starrdFavoriteValidation),
+  StarrdController.updateFavouriteStarrd
+);
 
 router.put(
   '/update-starrd/:starrdId',
