@@ -14,6 +14,7 @@ const starrdValidationSchema = z.object({
     socialLink: z.array(z.string().url()),
     uploadFiles: z.array(z.string()),
     userId: z.string().optional(),
+    favorite: z.boolean().optional(),
     serviceId: z.string().optional(),
     
 });

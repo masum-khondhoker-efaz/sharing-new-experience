@@ -6,8 +6,10 @@ export interface IUser {
   name: string;
   password?: string;
   role: UserRole;
+  phoneNumber?: string;
   profileImage?: string;
   fcmToken?: string;
+  favorite?: boolean;
   status: UserStatus;
   createdAt?: Date;
   updatedAt?: Date;

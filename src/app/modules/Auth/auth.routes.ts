@@ -20,7 +20,7 @@ router.post("/logout", AuthController.logoutUser);
 
 router.get(
   "/profile",
-  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.USER),
+  auth(),
   AuthController.getMyProfile
 );
 

@@ -204,9 +204,9 @@ const updateProfile = async (user: JwtPayload, payload: IUser) => {
       id: userInfo.id,
     },
     data: {
-      name: payload.name,
-      profileImage: payload.profileImage,
-      phoneNumber: payload.phoneNumber,
+      name: payload?.name || userInfo.name,
+      profileImage: payload?.profileImage || userInfo.profileImage,
+      phoneNumber: payload?.phoneNumber || userInfo.phoneNumber,
     },
     select: {
       id: true,
@@ -229,39 +229,39 @@ const updateProfile = async (user: JwtPayload, payload: IUser) => {
 };
 
 // update user data into database by id fir admin
-const updateUserIntoDb = async (payload: IUser, id: string) => {
-  const userInfo = await prisma.user.findUniqueOrThrow({
-    where: {
-      id: id,
-    },
-  });
-  if (!userInfo)
-    throw new ApiError(httpStatus.NOT_FOUND, 'User not found with id: ' + id);
+// const updateUserIntoDb = async (payload: IUser, id: string) => {
+//   const userInfo = await prisma.user.findUniqueOrThrow({
+//     where: {
+//       id: id,
+//     },
+//   });
+//   if (!userInfo)
+//     throw new ApiError(httpStatus.NOT_FOUND, 'User not found with id: ' + id);
 
-  const result = await prisma.user.update({
-    where: {
-      id: userInfo.id,
-    },
-    data: payload,
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      profileImage: true,
-      role: true,
-      createdAt: true,
-      updatedAt: true,
-    },
-  });
+//   const result = await prisma.user.update({
+//     where: {
+//       id: userInfo.id,
+//     },
+//     data: payload,
+//     select: {
+//       id: true,
+//       name: true,
+//       email: true,
+//       profileImage: true,
+//       role: true,
+//       createdAt: true,
+//       updatedAt: true,
+//     },
+//   });
 
-  if (!result)
-    throw new ApiError(
-      httpStatus.INTERNAL_SERVER_ERROR,
-      'Failed to update user profile'
-    );
+//   if (!result)
+//     throw new ApiError(
+//       httpStatus.INTERNAL_SERVER_ERROR,
+//       'Failed to update user profile'
+//     );
 
-  return result;
-};
+//   return result;
+// };
 
 const verifyEmailFromDb = async (userId:string, token: string) => {
   const isValidToken = jwtHelpers.verifyToken(
@@ -323,6 +323,6 @@ export const userService = {
   createUserIntoDb,
   getUsersFromDb,
   updateProfile,
-  updateUserIntoDb,
+  // updateUserIntoDb,
   verifyEmailFromDb,
 };

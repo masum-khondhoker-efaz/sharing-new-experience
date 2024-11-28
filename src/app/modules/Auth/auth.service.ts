@@ -1,4 +1,4 @@
-import { Secret } from 'jsonwebtoken';
+import { JwtPayload, Secret } from 'jsonwebtoken';
 import config from '../../../config';
 import { jwtHelpers } from '../../../helpars/jwtHelpers';
 import prisma from '../../../shared/prisma';
@@ -65,15 +65,12 @@ const loginUser = async (payload: {
 };
 
 // get user profile
-const getMyProfile = async (userToken: string) => {
-  const decodedToken = jwtHelpers.verifyToken(
-    userToken,
-    config.jwt.jwt_secret!
-  );
+const getMyProfile = async (user: JwtPayload) => {
+  
 
   const userProfile = await prisma.user.findUnique({
     where: {
-      id: decodedToken.id,
+      id: user.id,
     },
     select: {
       id: true,
@@ -125,7 +122,7 @@ const getMyProfile = async (userToken: string) => {
         id: userProfile.id,
         name: userProfile.name,
         email: userProfile.email,
-        profileImage: userProfile.profileImage || 'https://placehold.co/400', // fallback if profile image is not available
+        profileImage: userProfile.profileImage,
         phoneNumber: userProfile.phoneNumber,
         serviceViewed: starrdDetails.filter((detail) => detail !== null), // Filter out any null values
       },

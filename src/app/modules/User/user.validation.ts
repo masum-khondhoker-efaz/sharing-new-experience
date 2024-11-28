@@ -20,7 +20,7 @@ const  CreateUserValidationSchema = z.object({
   phoneNumber: z
   .string()
   .min(9, "Phone number must be at least 10 characters long")
-  .nonempty("Phone number is required"),
+  .optional(),
 
 });
 

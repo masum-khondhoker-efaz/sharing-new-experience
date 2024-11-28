@@ -4,6 +4,7 @@ import { AuthServices } from "./auth.service";
 import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
 import { string } from "zod";
+import { JwtPayload } from "jsonwebtoken";
 
 const loginUser = catchAsync(async (req: Request, res: Response) => {
 
@@ -34,9 +35,8 @@ const logoutUser = catchAsync(async (req: Request, res: Response) => {
 
 // get user profile
 const getMyProfile = catchAsync(async (req: Request, res: Response) => {
-  const userToken = req.headers.authorization;
-
-  const result = await AuthServices.getMyProfile(userToken as string);
+   const user = req?.user as JwtPayload;
+  const result = await AuthServices.getMyProfile(user);
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,

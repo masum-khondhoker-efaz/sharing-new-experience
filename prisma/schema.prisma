@@ -11,7 +11,7 @@ model User {
   id              String      @id @default(auto()) @map("_id") @db.ObjectId
   name             String
   email            String      @unique
-  phoneNumber      String      @unique
+  phoneNumber      String?      
   profileImage     String?
   password         String?
   fcmToken         String?
@@ -66,7 +66,7 @@ model Starrd {
   categoryId        String?         @db.ObjectId
   subCategoryId     String?         @db.ObjectId
   companyId         String?         @db.ObjectId 
-  location          Json
+  location          Json?
   rating            Float?
   favorite          Boolean?       @default(false)
   websiteLink       String
