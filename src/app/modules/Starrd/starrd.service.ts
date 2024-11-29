@@ -32,6 +32,7 @@ const createStarrdIntoDb = async (user: JwtPayload, payload: IStarrd) => {
             socialLink: starrd.socialLink,
             location: starrd.location as object,
             userId: user.id,
+            categoryId: starrd?.categoryId as string,
           },
         });
       }
