@@ -1,14 +1,14 @@
 import { JwtPayload } from 'jsonwebtoken';
 import prisma from '../../../shared/prisma';
 import { ICompany } from './company.interface';
+import { Company } from '@prisma/client';
 
-
-// create company   
-const createCompanyIntoDb = async (user: JwtPayload, payload: ICompany) => {
+// create company
+const createCompanyIntoDb = async (userId: string, payload: any) => {
   const company = await prisma.company.create({
     data: {
       ...payload,
-      userId: user.id,
+      userId: userId,
     },
   });
   return company;
@@ -16,24 +16,63 @@ const createCompanyIntoDb = async (user: JwtPayload, payload: ICompany) => {
 
 // get company
 const getCompanyFromDb = async () => {
-  const company = await prisma.company.findMany();
+  const company = await prisma.company.findMany({
+    include: {
+      category: {
+        select: {
+          companies: {
+            select: {
+              id: true,
+              companyName: true,
+              reviews: {
+                select: {
+                  rating: true,
+                },
+              },
+              location: true,
+            },
+          },
+        },
+      },
+    },
+  });
   return company;
 };
 
 // get company by id
-const getCompanyByIdFromDb = async (companyId: string) =>
-{
+const getCompanyByIdFromDb = async (companyId: string) => {
   const company = await prisma.company.findUnique({
     where: {
       id: companyId,
     },
+    include: {
+      category: {
+        select: {
+          companies: {
+            select: {
+              id: true,
+              companyName: true,
+              reviews: {
+                select: {
+                  rating: true,
+                },
+              },
+              location: true,
+            },
+          },
+        },
+      },
+    },
   });
   return company;
-}
-
+};
 
 // update company
-const updateCompanyIntoDb = async (user: JwtPayload, payload: ICompany, companyId: string) => {
+const updateCompanyIntoDb = async (
+  user: JwtPayload,
+  payload: any,
+  companyId: string
+) => {
   const company = await prisma.company.update({
     where: {
       id: companyId,
@@ -47,20 +86,19 @@ const updateCompanyIntoDb = async (user: JwtPayload, payload: ICompany, companyI
 };
 
 // delete company
-const deleteCompanyFromDb = async (companyId: string) =>
-{
+const deleteCompanyFromDb = async (companyId: string) => {
   const company = await prisma.company.delete({
     where: {
       id: companyId,
     },
   });
   return company;
-}
+};
 
 export const CompanyServices = {
   createCompanyIntoDb,
   getCompanyFromDb,
   updateCompanyIntoDb,
   deleteCompanyFromDb,
-  getCompanyByIdFromDb
+  getCompanyByIdFromDb,
 };

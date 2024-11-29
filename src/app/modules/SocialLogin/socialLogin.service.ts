@@ -6,10 +6,9 @@ import config from "../../../config";
 
 // google login into db
 const googleLoginIntoDb = async (user: any) => {
-    
   const isUserExist = await prisma.user.findUnique({
     where: {
-      googleId: user.id,
+      id: user.id,
     },
   });
 
@@ -30,11 +29,11 @@ const googleLoginIntoDb = async (user: any) => {
     const newUser = await prisma.user.create({
       data: {
         googleId: user.id,
-        email: user.emails ? user.emails[0].value : "",
-        name: user.displayName || "Unknown",
+        email: user.emails ? user.emails[0].value : '',
+        name: user.displayName || 'Unknown',
       },
     });
-   
+
     const token = jwtHelpers.generateToken(
       {
         id: newUser?.id,
@@ -44,16 +43,15 @@ const googleLoginIntoDb = async (user: any) => {
       config.jwt.jwt_secret as Secret,
       config.jwt.expires_in as string
     );
-    return token ;
+    return token;
   }
 };
-
 
 // facebook login into db
 const facebookLoginIntoDb = async (user: any) => {
   const isUserExist = await prisma.user.findUnique({
     where: {
-      facebookId: user.id,
+      id: user.id,
     },
   });
 
@@ -70,15 +68,15 @@ const facebookLoginIntoDb = async (user: any) => {
     return token;
   }
 
-    if (!isUserExist) {
+  if (!isUserExist) {
     const newUser = await prisma.user.create({
       data: {
         facebookId: user.id,
-        email: user.emails ? user.emails[0].value : "",
-        name: user.displayName || "Unknown",
+        email: user.emails ? user.emails[0].value : '',
+        name: user.displayName || 'Unknown',
       },
     });
-  
+
     const token = jwtHelpers.generateToken(
       {
         id: newUser?.id,

@@ -91,7 +91,8 @@ model Starrd {
 model Company {
   id            String      @id @default(auto()) @map("_id") @db.ObjectId
   companyName   String      @unique
-  userId        String       @db.ObjectId
+  userId        String      @db.ObjectId
+  categoryId    String      @db.ObjectId
   description   String?
   uploadFiles   Json[]
   openingHours  Json?
@@ -100,6 +101,7 @@ model Company {
   contact       String?
   email         String?
   location      Json
+  category      Category?   @relation(fields: [categoryId], references: [id])
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   user          User        @relation(fields: [userId], references: [id])
@@ -143,6 +145,7 @@ model Category {
   subcategories         Subcategory[]
   services              Service[]
   starrds               Starrd[]
+  companies             Company[]
 
   @@map("Categories")
 }

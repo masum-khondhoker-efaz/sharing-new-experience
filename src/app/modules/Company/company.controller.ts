@@ -7,9 +7,9 @@ import { JwtPayload } from 'jsonwebtoken';
 
 
 // create company
-const createCompany = catchAsync(async (req: Request, res: Response) => {
-  const user = req?.user as JwtPayload;
-  const result = await CompanyServices.createCompanyIntoDb(user, req.body);
+const createCompany = catchAsync(async (req: any, res: Response) => {
+  const userId = req.user.id;
+  const result = await CompanyServices.createCompanyIntoDb(userId, req.body);
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,

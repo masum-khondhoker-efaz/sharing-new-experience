@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 const CategorySchema = z.object({
-    name: z.string().min(1, "Name is required"),
+    categoryName: z.string().min(1, "Name is required"),
 });
 
 const SubcategorySchema = z.object({

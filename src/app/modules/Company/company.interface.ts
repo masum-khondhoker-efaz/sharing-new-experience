@@ -23,4 +23,5 @@ export interface ICompany {
     latitude: number;
     longitude: number;
   };
+  categoryId: string;
 }
