@@ -4,13 +4,16 @@ import auth from '../../middlewares/auth';
 import { UserRole } from '@prisma/client';
 import { companyValidation } from './company.validation';
 import { CompanyController } from './company.controller';
+import { fileUploader } from '../../../helpars/fileUploader';
+import { parseBody } from '../../middlewares/parseBody';
 
 const router = express.Router();
 
-
 router.post(
   '/create-company',
+  fileUploader.uploadCompanyImages,
   auth(UserRole.USER),
+  parseBody,
   validateRequest(companyValidation.companyValidationSchema),
   CompanyController.createCompany
 );

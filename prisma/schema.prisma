@@ -95,6 +95,7 @@ model Company {
   categoryId    String      @db.ObjectId
   description   String?
   uploadFiles   Json[]
+  logo          String?
   openingHours  Json?
   websiteLink   String
   socialLink    String[]
@@ -182,6 +183,17 @@ model Review {
   company      Company    @relation(fields: [companyId], references: [id])
 
   @@map("Reviews")
+}
+
+model Notification {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  title        String
+  body         String
+  logo         String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@map("Notifications")
 }
 
 
