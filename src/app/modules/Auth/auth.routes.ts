@@ -8,40 +8,22 @@ import { authValidation } from "./auth.validation";
 
 const router = express.Router();
 
-// user login route
 router.post(
-  "/login",
+  '/login',
   validateRequest(UserValidation.UserLoginValidationSchema),
   AuthController.loginUser
 );
-
-// user logout route
-router.post("/logout", AuthController.logoutUser);
-
-router.get(
-  "/profile",
-  auth(),
-  AuthController.getMyProfile
-);
-
+router.post('/logout', AuthController.logoutUser);
+router.get('/profile', auth(), AuthController.getMyProfile);
 router.put(
-  "/change-password",
+  '/change-password',
   auth(),
   validateRequest(authValidation.changePasswordValidationSchema),
   AuthController.changePassword
 );
-
-
-router.post(
-  '/forgot-password',
-  AuthController.forgotPassword
-);
-
-router.post(
-  '/reset-password',
-  AuthController.resetPassword
-)
-
+router.post('/forgot-password', AuthController.forgotPassword);
+router.put('/verify-otp', AuthController.verifyOtp);
+router.put('/reset-password', AuthController.resetPassword);
 router.post(
   '/profile-image-upload',
   auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.USER),

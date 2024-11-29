@@ -51,7 +51,6 @@ const createUserIntoDb = async (payload: IUser) => {
     throw new ApiError(500, 'Failed to create user');
   }
 
-
   const verifyEmailToken = jwtHelpers.generateToken(
     { email: result.email, role: result.role, id: result.id },
     config.jwt.verify_email_secret as Secret,
@@ -110,10 +109,6 @@ const createUserIntoDb = async (payload: IUser) => {
       `
   );
   return { message: 'Email verify link sent via your email successfully' };
-
-
-  
-
 };
 
 // reterive all users from the database also searcing anf filetering
@@ -204,9 +199,9 @@ const updateProfile = async (user: JwtPayload, payload: IUser) => {
       id: userInfo.id,
     },
     data: {
-      name: payload?.name || userInfo.name,
-      profileImage: payload?.profileImage || userInfo.profileImage,
-      phoneNumber: payload?.phoneNumber || userInfo.phoneNumber,
+      name: payload?.name,
+      profileImage: payload?.profileImage,
+      phoneNumber: payload?.phoneNumber,
     },
     select: {
       id: true,

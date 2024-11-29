@@ -6,8 +6,8 @@ import httpStatus from "http-status";
 import { string } from "zod";
 import { JwtPayload } from "jsonwebtoken";
 
+//login user
 const loginUser = catchAsync(async (req: Request, res: Response) => {
-
   const result = await AuthServices.loginUser(req.body);
   res.cookie("token", result.token, { httpOnly: true });
   sendResponse(res, {
@@ -17,6 +17,8 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
+//logout user
 const logoutUser = catchAsync(async (req: Request, res: Response) => {
   // Clear the token cookie
   res.clearCookie("token", {
@@ -63,31 +65,34 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-
 // forgot password
 const forgotPassword = catchAsync(async (req: Request, res: Response) => {
-
   await AuthServices.forgotPassword(req.body);
 
   sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "Check your email!",
-      data: null
+      message: "Please check your email to reset password!",
   })
 });
 
-const resetPassword = catchAsync(async (req: Request, res: Response) => {
-
-  const token = req.headers.authorization || "";
-
-  await AuthServices.resetPassword(token, req.body);
+const verifyOtp = catchAsync(async (req: Request, res: Response) => {
+  await AuthServices.verifyOtpInDB(req.body);
 
   sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "Password Reset!",
-      data: null
+      message: "OTP verified successfully!",
+  })
+})
+
+const resetPassword = catchAsync(async (req: Request, res: Response) => {
+  await AuthServices.resetPassword(req.body);
+
+  sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Password Reset Successfully!",
   })
 });
 
@@ -132,8 +137,7 @@ export const AuthController = {
   getMyProfile,
   changePassword,
   forgotPassword,
+  verifyOtp,
   resetPassword,
   profileImageUpload,
-  // loginWithGoogle,
-  // loginWithFacebook
 };

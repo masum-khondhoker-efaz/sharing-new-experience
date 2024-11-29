@@ -21,6 +21,8 @@ model User {
   points           Int        @default(0)
   badge            String?
   serviceViewed    Json?
+  otp              String?
+  expiresAt        DateTime?
   role             UserRole   @default(USER)
   status           UserStatus @default(INACTIVE)
   createdAt        DateTime   @default(now())

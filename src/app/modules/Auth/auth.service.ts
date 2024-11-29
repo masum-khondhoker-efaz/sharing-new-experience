@@ -132,8 +132,6 @@ const getMyProfile = async (user: JwtPayload) => {
   return { success: false, message: 'User not found' };
 };
 
-
-
 // change password
 const changePassword = async (
   userToken: string,
@@ -175,26 +173,36 @@ const changePassword = async (
   return { message: 'Password changed successfully' };
 };
 
+//gorget password
 const forgotPassword = async (payload: { email: string }) => {
-  const userData = await prisma.user.findUniqueOrThrow({
+  const userData = await prisma.user.findUnique({
     where: {
       email: payload.email,
     },
   });
 
-  const resetPassToken = jwtHelpers.generateToken(
-    { email: userData.email, role: userData.role, id: userData.id },
-    config.jwt.reset_pass_secret as Secret,
-    config.jwt.reset_pass_token_expires_in as string
-  );
-  const resetPassLink =
-    config.reset_pass_link + `?userId=${userData.id}&token=${resetPassToken}`;
+  if (!userData) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found with this email');
+  }
+
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const otpExpiresAt = new Date();
+  otpExpiresAt.setMinutes(otpExpiresAt.getMinutes() + 5);
+  const otpExpiresAtString = otpExpiresAt.toISOString();
+
+  await prisma.user.update({
+    where: { email: payload.email },
+    data: {
+      otp: otp,
+      expiresAt: otpExpiresAtString,
+    },
+  });
 
   await emailSender(
     'Reset Your Password',
     userData.email,
-    
-     `<div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+
+    `<div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
     <table width="100%" style="border-collapse: collapse;">
     <tr>
       <td style="background-color: #007BFF; padding: 20px; text-align: center; color: #ffffff; border-radius: 10px 10px 0 0;">
@@ -203,26 +211,14 @@ const forgotPassword = async (payload: { email: string }) => {
     </tr>
     <tr>
       <td style="padding: 20px;">
-        <p style="font-size: 16px; margin: 0;">Hello <strong>${userData.name}</strong>,</p>
+        <p style="font-size: 16px; margin: 0;">Hello <strong>${
+          userData.name
+        }</strong>,</p>
         <p style="font-size: 16px;">We received a request to reset your password. Please click the button below to proceed with resetting your password.</p>
-        
         <div style="text-align: center; margin: 20px 0;">
-          <a href="${resetPassLink}" style="
-              background-color: #007BFF;
-              color: white;
-              padding: 12px 24px;
-              border-radius: 5px;
-              font-size: 16px;
-              font-weight: bold;
-              text-decoration: none;
-              display: inline-block;
-              cursor: pointer;">
-            Reset Password
-          </a>
+          <p>reset password using this OTP: ${otp}, This OTP is Expired in 5 minutes,</p>
         </div>
-        
         <p style="font-size: 14px; color: #555;">If you did not request this change, please ignore this email. No further action is needed.</p>
-        
         <p style="font-size: 16px; margin-top: 20px;">Thank you,<br>StarrdApp</p>
       </td>
     </tr>
@@ -239,36 +235,56 @@ const forgotPassword = async (payload: { email: string }) => {
   return { message: 'Reset password link sent via your email successfully' };
 };
 
-// reset password
-const resetPassword = async (token: string, payload: { password: string }) => {
-  const isValidToken = jwtHelpers.verifyToken(
-    token,
-    config.jwt.reset_pass_secret as Secret
-  );
+// verify otp
+const verifyOtpInDB = async (bodyData: { email: string; otp: string }) => {
+  const userData = await prisma.user.findUnique({
+    where: { email: bodyData.email },
+  });
 
-  if (!isValidToken) {
-    throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden!');
+  if (!userData) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found!');
+  }
+  const currentTime = new Date(Date.now());
+
+  if (userData?.otp !== bodyData.otp) {
+    throw new ApiError(404, 'Your OTP is incorrect!');
+  } else if (!userData.expiresAt || userData.expiresAt <= currentTime) {
+    throw new ApiError(409, 'Your OTP is expired, please send new otp');
   }
 
-  const userData = await prisma.user.findUniqueOrThrow({
-    where: {
-      id: isValidToken.id,
-    },
+  return;
+};
+
+//reset password for app
+const resetPassword = async (payload: {
+  email: string;
+  newPassword: string;
+}) => {
+  const user = await prisma.user.findFirst({
+    where: { email: payload.email },
   });
 
-  // hash password
-  const password = await bcrypt.hash(payload.password, 12);
+  if (!user) {
+    throw new ApiError(404, "user not found");
+  }
 
-  // update into database
+  const hashedPassword = await bcrypt.hash(
+    payload.newPassword,
+    Number(config.bcrypt_salt_rounds)
+  );
+
   await prisma.user.update({
     where: {
-      id: userData.id,
+      id: user.id,
     },
     data: {
-      password,
+      password: hashedPassword,
+      otp: null,
+      expiresAt: null,
     },
   });
-  return { message: 'Password reset successfully' };
+
+  return user;
 };
 
 // const loginWithGoogleIntoDb = async (payload: IUser) => {
@@ -303,7 +319,6 @@ const resetPassword = async (token: string, payload: { password: string }) => {
 //       }
 //     })
 //   }
-
 
 //   const accessToken = jwtHelpers.generateToken(
 //     {
@@ -383,19 +398,18 @@ const profileImageUploadIntoDb = async (userToken: string, payload: IUser) => {
     where: {
       id: decodedToken.id,
     },
-    data: payload
+    data: payload,
   });
 
   return updatedUser;
 };
-
-
 
 export const AuthServices = {
   loginUser,
   getMyProfile,
   changePassword,
   forgotPassword,
+  verifyOtpInDB,
   resetPassword,
   profileImageUploadIntoDb,
   // loginWithGoogleIntoDb,
