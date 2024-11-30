@@ -2,19 +2,33 @@ import ApiError from '../../../errors/ApiErrors';
 import prisma from '../../../shared/prisma';
 import { IStarrd } from './starrd.interface';
 import { JwtPayload } from 'jsonwebtoken';
+import config from '../../../config';
 
 
 // create starrd
-const createStarrdIntoDb = async (user: JwtPayload, payload: IStarrd) => {
+const createStarrdIntoDb = async (user: JwtPayload, req: any) => {
+  const files = req.files;
+  const uploadFiles = files?.uploadFiles;
+
+  if (!files || files.length === 0) {
+    throw new ApiError(400, 'Please upload at least one file');
+  }
+
+  const imageUrls = uploadFiles.map((e: any) => {
+    const result = e ? `${config.backend_base_url}/uploads/${e.filename}` : null;
+    return result;
+  });
+
+  const payload = req.body;
   const transaction = await prisma.$transaction(async (prisma) => {
-    
     const starrd = await prisma.starrd.create({
       data: {
         ...payload,
         userId: user.id,
+        uploadFiles: imageUrls,
       },
     });
-    
+
     if (!starrd) throw new Error('Failed to create starrd');
 
     if (starrd.companyName) {
@@ -60,7 +74,7 @@ const createStarrdIntoDb = async (user: JwtPayload, payload: IStarrd) => {
           categoryId: category.id,
         },
       });
-      
+
       if (starrd.subCategoryName) {
         let subcategory = await prisma.subcategory.findUnique({
           where: {
@@ -86,23 +100,24 @@ const createStarrdIntoDb = async (user: JwtPayload, payload: IStarrd) => {
         });
       }
     }
-    // Fetch points from PointsLevel where name is "Join into app"
-  const point = await prisma.pointsLevel.findFirst({
-    where: {
-      OR: [
-        { name: 'Add a new item or product' },
-        { name: 'Share a place or product' },
-      ],
-    },
-    select: {
-      points: true,
-    },
-  });
 
-  // If pointsLevel for "Join into app" not found, throw error
-  if (!point) {
-    throw new ApiError(404, "Points level 'Join into app' not found");
-  }
+    // Fetch points from PointsLevel where name is "Join into app"
+    const point = await prisma.pointsLevel.findFirst({
+      where: {
+        OR: [
+          { name: 'Add a new item or product' },
+          { name: 'Share a place or product' },
+        ],
+      },
+      select: {
+        points: true,
+      },
+    });
+
+    // If pointsLevel for "Join into app" not found, throw error
+    if (!point) {
+      throw new ApiError(404, "Points level 'Join into app' not found");
+    }
 
     // Increment points for the user
     await prisma.user.update({

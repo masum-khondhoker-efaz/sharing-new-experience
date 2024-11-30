@@ -7,7 +7,7 @@ import { JwtPayload } from 'jsonwebtoken';
 
 const createStarrd = catchAsync(async (req: Request, res: Response) => {
     const user = req?.user as JwtPayload;
-    const result = await StarrdServices.createStarrdIntoDb(user,req.body);
+    const result = await StarrdServices.createStarrdIntoDb(user,req);
     sendResponse(res, {
         statusCode: httpStatus.CREATED,
         success: true,

@@ -4,16 +4,21 @@ import auth from '../../middlewares/auth';
 import { UserRole } from '@prisma/client';
 import { StarrdController } from './starrd.controller';
 import {starrdValidation} from './starrd.validation';
+import { fileUploader } from '../../../helpars/fileUploader';
+import { parse } from 'path';
+import { parseBody } from '../../middlewares/parseBody';
 
 const router = express.Router();
 
 
 
 router.post(
-    '/create-starrd',
-    auth(UserRole.USER),
-    validateRequest(starrdValidation.starrdValidationSchema),
-    StarrdController.createStarrd
+  '/create-starrd',
+  fileUploader.uploadStarrdImages,
+  parseBody,
+  auth(UserRole.USER),
+  validateRequest(starrdValidation.starrdValidationSchema),
+  StarrdController.createStarrd
 );
 
 router.get(

@@ -22,9 +22,14 @@ const uploadReviewImages = upload.fields([
   { name: 'uploadFiles', maxCount: 5 },
 ]);
 
+const uploadStarrdImages = upload.fields([
+  { name: 'uploadFiles', maxCount: 5 },
+]);
+
 export const fileUploader = {
   upload,
   uploadprofileImage,
   uploadCompanyImages,
   uploadReviewImages,
+  uploadStarrdImages,
 };
