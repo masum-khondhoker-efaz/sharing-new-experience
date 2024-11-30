@@ -51,8 +51,8 @@ const createSubcategoryIntoDb = async (user: JwtPayload, payload: ISubcategory, 
   const subcategory = await prisma.subcategory.create({
     data: {
       ...payload,
+      categoryId: categoryId,
       userId: user.id,
-      categoryId: categoryId
     },
   });
   return subcategory;

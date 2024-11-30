@@ -5,7 +5,7 @@ const CategorySchema = z.object({
 });
 
 const SubcategorySchema = z.object({
-  subCategoryName: z.string().min(1, 'Name is required'),
+  subCategoryName: z.string(),
 });
 
 
