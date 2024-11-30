@@ -4,9 +4,10 @@ import { AuthServices } from "./auth.service";
 import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
 import { string } from "zod";
+import { JwtPayload } from "jsonwebtoken";
 
+//login user
 const loginUser = catchAsync(async (req: Request, res: Response) => {
-
   const result = await AuthServices.loginUser(req.body);
   res.cookie("token", result.token, { httpOnly: true });
   sendResponse(res, {
@@ -16,6 +17,8 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
+//logout user
 const logoutUser = catchAsync(async (req: Request, res: Response) => {
   // Clear the token cookie
   res.clearCookie("token", {
@@ -34,12 +37,11 @@ const logoutUser = catchAsync(async (req: Request, res: Response) => {
 
 // get user profile
 const getMyProfile = catchAsync(async (req: Request, res: Response) => {
-  const userToken = req.headers.authorization;
-
-  const result = await AuthServices.getMyProfile(userToken as string);
+   const user = req?.user as JwtPayload;
+  const result = await AuthServices.getMyProfile(user);
   sendResponse(res, {
     success: true,
-    statusCode: 201,
+    statusCode: httpStatus.OK,
     message: "User profile retrieved successfully",
     data: result,
   });
@@ -57,41 +59,77 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
   );
   sendResponse(res, {
     success: true,
-    statusCode: 201,
+    statusCode: httpStatus.OK,
     message: "Password changed successfully",
     data: result,
   });
 });
 
-
 // forgot password
 const forgotPassword = catchAsync(async (req: Request, res: Response) => {
-
   await AuthServices.forgotPassword(req.body);
 
   sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "Check your email!",
-      data: null
+      message: "Please check your email to reset password!",
   })
 });
 
-const resetPassword = catchAsync(async (req: Request, res: Response) => {
-
-  const token = req.headers.authorization || "";
-
-  await AuthServices.resetPassword(token, req.body);
+const verifyOtp = catchAsync(async (req: Request, res: Response) => {
+  await AuthServices.verifyOtpInDB(req.body);
 
   sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "Password Reset!",
-      data: null
+      message: "OTP verified successfully!",
+  })
+})
+
+const resetPassword = catchAsync(async (req: Request, res: Response) => {
+  await AuthServices.resetPassword(req.body);
+
+  sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Password Reset Successfully!",
   })
 });
 
+// const loginWithGoogle = catchAsync(async (req: Request, res: Response) => {
+//   const result = await AuthServices.loginWithGoogleIntoDb(req.body);
+//   res.cookie("token", result.token, { httpOnly: true });
+//   sendResponse(res, {
+//     statusCode: httpStatus.OK,
+//     success: true,
+//     message: "User logged in successfully",
+//     data: result,
+//   });
+// });
 
+// const loginWithFacebook = catchAsync(async (req: Request, res: Response) => {
+//   const result = await AuthServices.loginWithFacebookIntoDb(req.body);
+//   res.cookie("token", result.token, { httpOnly: true });
+//   sendResponse(res, {
+//     statusCode: httpStatus.OK,
+//     success: true,
+//     message: "User logged in successfully",
+//     data: result,
+//   });
+// });
+
+
+const profileImageUpload = catchAsync(async (req: Request, res: Response) => {
+  const userToken = req.headers.authorization;
+  const result = await AuthServices.profileImageUploadIntoDb(userToken as string, req.body);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Profile image uploaded successfully",
+    data: result,
+  });
+}
+);
 
 export const AuthController = {
   loginUser,
@@ -99,5 +137,7 @@ export const AuthController = {
   getMyProfile,
   changePassword,
   forgotPassword,
-  resetPassword
+  verifyOtp,
+  resetPassword,
+  profileImageUpload,
 };

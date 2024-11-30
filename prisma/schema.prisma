@@ -8,19 +8,194 @@ datasource db {
 }
 
 model User {
-  id           String     @id @default(auto()) @map("_id") @db.ObjectId
-  name         String
-  email        String     @unique
-  phoneNumber  String?
-  profileImage String?
-  password     String
-  role         UserRole   @default(USER)
-  status       UserStatus @default(ACTIVE)
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId
+  name             String
+  email            String      @unique
+  phoneNumber      String?      
+  profileImage     String?
+  password         String?
+  fcmToken         String?
+  googleId         String?   
+  facebookId       String?    
+  deviceToken      String?
+  points           Int        @default(0)
+  badge            String?
+  serviceViewed    Json?
+  otp              String?
+  expiresAt        DateTime?
+  role             UserRole   @default(USER)
+  status           UserStatus @default(INACTIVE)
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  reviews          Review[]
+  starrds          Starrd[]
+  companies        Company[]
+  services         Service[]
+  categories       Category[]
+  subcategories    Subcategory[]
 
   @@map("Users")
 }
+
+model PointsLevel {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  points       Int
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@map("PointsLevels")
+}
+
+model Milestone {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  points       Int       @default(0)
+  badge        String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@map("Milestones")
+}
+
+model Starrd {
+  id                String       @id @default(auto()) @map("_id") @db.ObjectId
+  name              String
+  personalNote      String
+  companyName       String    
+  categoryName      String      
+  subCategoryName   String         
+  categoryId        String?         @db.ObjectId
+  subCategoryId     String?         @db.ObjectId
+  companyId         String?         @db.ObjectId 
+  location          Json?
+  rating            Float?
+  favorite          Boolean?       @default(false)
+  websiteLink       String
+  socialLink        String[]
+  uploadFiles       String[]
+  reviewIds         String[]       @db.ObjectId
+  userId            String         @db.ObjectId
+  serviceId         String?        @db.ObjectId
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  user              User           @relation(fields: [userId], references: [id])
+  service           Service?       @relation(fields: [serviceId], references: [id])
+  subcategory       Subcategory?   @relation(fields: [subCategoryId], references: [id])
+  category          Category?      @relation(fields: [categoryId], references: [id])
+  company           Company?       @relation(fields: [companyId], references: [id])
+  reviews           Review[]
+  @@map("Starrds")
+}
+
+model Company {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  companyName   String      @unique
+  userId        String      @db.ObjectId
+  categoryId    String      @db.ObjectId
+  description   String?
+  uploadFiles   Json[]
+  logo          String?
+  openingHours  Json?
+  websiteLink   String
+  socialLink    String[]
+  contact       String?
+  email         String?
+  location      Json
+  category      Category?   @relation(fields: [categoryId], references: [id])
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  user          User        @relation(fields: [userId], references: [id])
+  services      Service[]
+  starrds       Starrd[]
+  reviews       Review[]
+
+  @@map("Companies")
+}
+
+model Service {
+  id           String      @id @default(auto()) @map("_id") @db.ObjectId
+  serviceName  String      @unique
+  description  String?
+  categoryId   String      @db.ObjectId
+  subcategoryId String     @db.ObjectId
+  companyId    String      @db.ObjectId
+  userId       String      @db.ObjectId
+  reviewIds    String[]    @db.ObjectId
+  images       String[]
+  starrdIds    String[]    @db.ObjectId
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  reviews      Review[]
+  company      Company     @relation(fields: [companyId], references: [id])
+  user         User        @relation(fields: [userId], references: [id])
+  category     Category    @relation(fields: [categoryId], references: [id])
+  subcategory  Subcategory @relation(fields: [subcategoryId], references: [id])
+  starrds      Starrd[]
+
+  @@map("Services")
+}
+
+model Category {
+  id                    String     @id @default(auto()) @map("_id") @db.ObjectId
+  categoryName          String     @unique
+  userId                String     @db.ObjectId
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+  user                  User       @relation(fields: [userId], references: [id])
+  subcategories         Subcategory[]
+  services              Service[]
+  starrds               Starrd[]
+  companies             Company[]
+
+  @@map("Categories")
+}
+
+model Subcategory {
+  id                      String     @id @default(auto()) @map("_id") @db.ObjectId
+  subCategoryName         String     @unique
+  userId                  String     @db.ObjectId
+  categoryId              String     @db.ObjectId
+  createdAt               DateTime   @default(now())
+  updatedAt               DateTime   @updatedAt
+  category                Category   @relation(fields: [categoryId], references: [id])
+  user                    User       @relation(fields: [userId], references: [id])
+  services                Service[]
+  starrds                 Starrd[]
+
+  @@map("Subcategories")
+}
+
+model Review {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  comment      String
+  rating       Int
+  images       String[]
+  userId       String     @db.ObjectId
+  starrdId     String    @db.ObjectId
+  serviceId    String?     @db.ObjectId
+  companyId    String     @db.ObjectId
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  user         User       @relation(fields: [userId], references: [id])
+  service      Service?    @relation(fields: [serviceId], references: [id])
+  starrd       Starrd     @relation(fields: [starrdId], references: [id])
+  company      Company    @relation(fields: [companyId], references: [id])
+
+  @@map("Reviews")
+}
+
+model Notification {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  title        String
+  body         String
+  logo         String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@map("Notifications")
+}
+
 
 enum UserRole {
   ADMIN
