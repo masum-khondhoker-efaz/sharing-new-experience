@@ -41,7 +41,7 @@ router.delete(
 router.post(
   '/create-subcategory/:categoryId',
   auth(),
-  validateRequest(categoryValidation.CategorySchema),
+  validateRequest(categoryValidation.SubcategorySchema),
   CategoriesController.createSubcategory
 );
 
