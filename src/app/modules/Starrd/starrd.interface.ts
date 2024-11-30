@@ -18,6 +18,5 @@ export interface IStarrd {
   reviewIds?: string[];
   websiteLink: string;
   socialLink: string[];
-  uploadFiles: string[];
   serviceId?: string;
 }

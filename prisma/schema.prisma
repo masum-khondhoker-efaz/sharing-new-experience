@@ -94,7 +94,7 @@ model Company {
   userId        String      @db.ObjectId
   categoryId    String      @db.ObjectId
   description   String?
-  uploadFiles   Json[]
+  uploadFiles   String[]
   logo          String?
   openingHours  Json?
   websiteLink   String
@@ -117,7 +117,7 @@ model Service {
   id           String      @id @default(auto()) @map("_id") @db.ObjectId
   serviceName  String      @unique
   description  String?
-  categoryId   String      @db.ObjectId
+  categoryId   String?      @db.ObjectId
   subcategoryId String     @db.ObjectId
   companyId    String      @db.ObjectId
   userId       String      @db.ObjectId
@@ -129,7 +129,7 @@ model Service {
   reviews      Review[]
   company      Company     @relation(fields: [companyId], references: [id])
   user         User        @relation(fields: [userId], references: [id])
-  category     Category    @relation(fields: [categoryId], references: [id])
+  category     Category?    @relation(fields: [categoryId], references: [id])
   subcategory  Subcategory @relation(fields: [subcategoryId], references: [id])
   starrds      Starrd[]
 

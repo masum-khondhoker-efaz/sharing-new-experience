@@ -8,7 +8,7 @@ import config from '../../../config';
 // create starrd
 const createStarrdIntoDb = async (user: JwtPayload, req: any) => {
   const files = req.files;
-  const uploadFiles = files?.uploadFiles;
+  const uploadFiles = files?.uploadFiles || [];
 
   if (!files || files.length === 0) {
     throw new ApiError(400, 'Please upload at least one file');
@@ -20,6 +20,7 @@ const createStarrdIntoDb = async (user: JwtPayload, req: any) => {
   });
 
   const payload = req.body;
+
   const transaction = await prisma.$transaction(async (prisma) => {
     const starrd = await prisma.starrd.create({
       data: {
@@ -38,15 +39,25 @@ const createStarrdIntoDb = async (user: JwtPayload, req: any) => {
         },
       });
       if (!company) {
+        let categoryId = null;
+        if (starrd.categoryName) {
+          const category = await prisma.category.findUniqueOrThrow({
+            where: {
+              categoryName: starrd.categoryName,
+            },
+          });
+          categoryId = category.id;
+        }
+
         company = await prisma.company.create({
           data: {
             companyName: starrd.companyName,
-            uploadFiles: starrd.uploadFiles,
+            uploadFiles: imageUrls,
             websiteLink: starrd.websiteLink,
             socialLink: starrd.socialLink,
             location: starrd.location as object,
             userId: user.id,
-            categoryId: starrd?.categoryId as string,
+            categoryId: categoryId as string,
           },
         });
       }
@@ -127,7 +138,7 @@ const createStarrdIntoDb = async (user: JwtPayload, req: any) => {
 
     return starrd;
   });
-
+  
   return transaction;
 };
 
@@ -179,12 +190,14 @@ const getStarrdByIdFromDb = async (user: JwtPayload, starrdId: string) => {
     // Fetch the Starrd record
     const starrd = await prisma.starrd.findUnique({
       where: {
+        userId: user.id,
         id: starrdId,
       },
     });
-    
-    
 
+    if (!starrd) {
+      throw new Error('Starrd not found.');
+    }
 
     // Fetch the current serviceViewed JSON
     const userRecord = await prisma.user.findUnique({
@@ -233,12 +246,11 @@ const getStarrdByIdFromDb = async (user: JwtPayload, starrdId: string) => {
       where: { id: user.id },
       data: { serviceViewed },
     });
-     
+
     return starrd;
   });
+
   return result;
-
-
 };
 
 // get starrd by company
