@@ -26,6 +26,7 @@ const uploadStarrdImages = upload.fields([
   { name: 'uploadFiles', maxCount: 5 },
 ]);
 
+
 export const fileUploader = {
   upload,
   uploadprofileImage,
