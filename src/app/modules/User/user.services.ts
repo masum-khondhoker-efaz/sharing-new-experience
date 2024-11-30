@@ -182,7 +182,7 @@ const getUsersFromDb = async (
 };
 
 // update profile by user won profile using token or email and id
-const updateProfile = async (user: JwtPayload, payload: IUser) => {
+const updateProfile = async (user: JwtPayload, req: any) => {
   const userInfo = await prisma.user.findUnique({
     where: {
       id: user.id,
@@ -190,10 +190,20 @@ const updateProfile = async (user: JwtPayload, payload: IUser) => {
   });
 
   if (!userInfo) {
-    throw new ApiError(404, 'User not found');  
+    throw new ApiError(404, 'User not found');
   }
 
-  // Update the user profile with the new information
+  const profileImageFile = req.file; // use req.file, not req.files
+
+  let profileImageUrl = profileImageFile.profileImage; // Default to the current profile image
+
+  if (profileImageFile) {
+    profileImageUrl = `${config.backend_base_url}/uploads/${profileImageFile.filename}`; // Set the new image URL
+  }
+
+  const payload = req.body;
+
+  // Update the user profile with the new information and uploaded image URL
   const result = await prisma.user.update({
     where: {
       id: userInfo.id,
@@ -201,6 +211,7 @@ const updateProfile = async (user: JwtPayload, payload: IUser) => {
     data: {
       name: payload.name,
       phoneNumber: payload.phoneNumber,
+      profileImage: profileImageUrl, // Save the new profile image URL
     },
     select: {
       id: true,
@@ -213,6 +224,53 @@ const updateProfile = async (user: JwtPayload, payload: IUser) => {
     },
   });
 
+  return result;
+};
+
+
+
+
+
+
+
+const updateProfileWithImage = async (user: JwtPayload, req: any) => {
+  const userInfo = await prisma.user.findUnique({
+    where: {
+      id: user.id,
+    },
+  });
+
+  if (!userInfo) {
+    throw new ApiError(404, 'User not found');
+  }
+
+  const file = req.file;
+  let profileImageUrl = userInfo.profileImage;
+
+  if (file) {
+    profileImageUrl = `${config.backend_base_url}/uploads/${file.filename}`;
+  }
+
+  // Update the user profile with the new information
+  const result = await prisma.user.update({
+    where: {
+      id: userInfo.id,
+    },
+    data: {
+      name: req.body.name,
+      phoneNumber: req.body.phoneNumber,
+      profileImage: profileImageUrl,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      profileImage: true,
+      phoneNumber: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
 
   return result;
 };
