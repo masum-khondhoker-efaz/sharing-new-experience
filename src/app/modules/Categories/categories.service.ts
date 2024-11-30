@@ -60,13 +60,7 @@ const createSubcategoryIntoDb = async (user: JwtPayload, payload: ISubcategory, 
 
 // get subcategory
 const getSubcategoryFromDb = async (user: JwtPayload) => {
-  const subcategory = await prisma.subcategory.findMany(
-    {
-      where: {
-        userId: user.id,
-      },
-    }
-  );
+  const subcategory = await prisma.subcategory.findMany();
   return subcategory;
 };
 

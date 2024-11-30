@@ -181,7 +181,7 @@ const getUsersFromDb = async (
   };
 };
 
-// update profile by user won profile uisng token or email and id
+// update profile by user won profile using token or email and id
 const updateProfile = async (user: JwtPayload, payload: IUser) => {
   const userInfo = await prisma.user.findUnique({
     where: {
@@ -199,9 +199,8 @@ const updateProfile = async (user: JwtPayload, payload: IUser) => {
       id: userInfo.id,
     },
     data: {
-      name: payload?.name,
-      profileImage: payload?.profileImage,
-      phoneNumber: payload?.phoneNumber,
+      name: payload.name,
+      phoneNumber: payload.phoneNumber,
     },
     select: {
       id: true,
@@ -214,11 +213,6 @@ const updateProfile = async (user: JwtPayload, payload: IUser) => {
     },
   });
 
-  if (!result)
-    throw new ApiError(
-      httpStatus.INTERNAL_SERVER_ERROR,
-      'Failed to update user profile'
-    );
 
   return result;
 };

@@ -15,7 +15,10 @@ const upload = multer({ storage: storage });
 // upload single image
 const uploadprofileImage = upload.single('profileImage');
 const uploadCompanyImages = upload.fields([
-  { name: 'companyLogo', maxCount: 1 },
+  // { name: 'companyLogo', maxCount: 1 },
+  { name: 'uploadFiles', maxCount: 5 },
+]);
+const uploadReviewImages = upload.fields([
   { name: 'uploadFiles', maxCount: 5 },
 ]);
 
@@ -23,4 +26,5 @@ export const fileUploader = {
   upload,
   uploadprofileImage,
   uploadCompanyImages,
+  uploadReviewImages,
 };

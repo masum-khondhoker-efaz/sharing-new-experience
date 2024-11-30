@@ -40,7 +40,7 @@ router.delete(
 // add subcategory route
 router.post(
   '/create-subcategory/:categoryId',
-  auth(UserRole.SUPER_ADMIN),
+  auth(),
   validateRequest(categoryValidation.CategorySchema),
   CategoriesController.createSubcategory
 );
@@ -48,14 +48,14 @@ router.post(
 // get subcategory route
 router.get(
   '/get-subcategory',
-  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  auth(),
   CategoriesController.getSubcategory
 );
 
 // update subcategory route
 router.put(
   '/update-subcategory/:subcategoryId',
-  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  auth(),
   validateRequest(categoryValidation.CategorySchema),
   CategoriesController.updateSubcategory
 );

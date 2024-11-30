@@ -20,19 +20,19 @@ router.post(
 
 router.get(
   '/get-company',
-  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.USER),
+  auth(),
   CompanyController.getCompany
 );
 
 router.get(
   '/get-company-specific/:companyId',
-  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.USER),
+  auth(),
   CompanyController.getCompanyById
 );
 
 router.put(
     '/update-company/:companyId',
-    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.USER),
+    auth(),
     validateRequest(companyValidation.companyValidationSchema),
     CompanyController.updateCompany
     );

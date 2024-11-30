@@ -25,7 +25,8 @@ router.get("/", userController.getUsers);
 
 // *!profile user
 router.put(
-  "/profile-update",
+  '/profile-update',
+  validateRequest(UserValidation.userUpdateSchema),
   auth(),
   userController.updateProfile
 );

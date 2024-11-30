@@ -6,13 +6,13 @@ import ApiError from '../../../errors/ApiErrors';
 // create company
 const createCompanyIntoDb = async (req: any) => {
   const files = req.files;
-  const logo = req.files.companyLogo[0];
+  // const logo = req.files.companyLogo[0];
   const uploadFiles = req.files.uploadFiles;
 
-  if (!logo) {
-    throw new ApiError(400, 'Please upload a logo');
-  }
-  const companyLogo = `${config.backend_base_url}/uploads/${logo.filename}`;
+  // if (!logo) {
+  //   throw new ApiError(400, 'Please upload a logo');
+  // }
+  // const companyLogo = `${config.backend_base_url}/uploads/${logo.filename}`;
 
   if (!files || files.length === 0) {
     throw new ApiError(400, 'Please upload at least one file');
@@ -32,7 +32,7 @@ const createCompanyIntoDb = async (req: any) => {
       ...payload,
       userId: userId,
       uploadFiles: imageUrls,
-      logo: companyLogo,
+      // logo: companyLogo,
     },
   });
   return company;

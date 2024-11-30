@@ -7,8 +7,10 @@ import { JwtPayload } from 'jsonwebtoken';
 
 // add review controller
 const addReview = catchAsync(async (req: Request, res: Response) => {
-    const user = req?.user as JwtPayload;
-  const result = await ReviewServices.addReviewIntoDb(user, req.body);
+  const user = req?.user as JwtPayload;
+ 
+
+  const result = await ReviewServices.addReviewIntoDb(user, req);
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,

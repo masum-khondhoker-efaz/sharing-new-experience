@@ -36,9 +36,8 @@ const UserLoginValidationSchema = z.object({
 });
 
 const userUpdateSchema = z.object({
-  name: z.string().optional(),
-  profileImage: z.string().url().optional(),
-  phoneNumber: z.string().optional(), 
+  name: z.string().min(1, "User name must be have at least 1 character").nonempty("Name is required"),
+  phoneNumber: z.string().nonempty("Phone number is required"), 
 });
 
 export const UserValidation = {

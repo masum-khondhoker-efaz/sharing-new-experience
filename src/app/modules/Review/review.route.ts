@@ -8,12 +8,16 @@ enum UserRole {
 }
 import { ReviewController } from './review.controller';
 import { reviewValidation } from './review.validation';
+import { fileUploader } from '../../../helpars/fileUploader';
+import { parseBody } from '../../middlewares/parseBody';
 
 const router = express.Router();
 
 // add review route
 router.post(
   '/create-review',
+  fileUploader.uploadReviewImages,
+  parseBody,
   validateRequest(reviewValidation.ReviewSchema),
   auth(UserRole.USER),
   ReviewController.addReview

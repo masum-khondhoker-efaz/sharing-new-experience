@@ -164,14 +164,12 @@ const getStarrdByIdFromDb = async (user: JwtPayload, starrdId: string) => {
     // Fetch the Starrd record
     const starrd = await prisma.starrd.findUnique({
       where: {
-        userId: user.id,
         id: starrdId,
       },
     });
+    
+    
 
-    if (!starrd) {
-      throw new Error('Starrd not found.');
-    }
 
     // Fetch the current serviceViewed JSON
     const userRecord = await prisma.user.findUnique({
@@ -220,11 +218,12 @@ const getStarrdByIdFromDb = async (user: JwtPayload, starrdId: string) => {
       where: { id: user.id },
       data: { serviceViewed },
     });
-
+     
     return starrd;
   });
-
   return result;
+
+
 };
 
 // get starrd by company

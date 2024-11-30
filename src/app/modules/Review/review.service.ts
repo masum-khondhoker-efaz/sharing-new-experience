@@ -1,37 +1,76 @@
 import { JwtPayload } from 'jsonwebtoken';
 import prisma from '../../../shared/prisma';
 import { IReview } from './review.interface';
-
+import { File } from 'buffer';
+import config from '../../../config';
 // add review into db
-const addReviewIntoDb = async (user: JwtPayload, payload: IReview) => {
-  if (payload.starrdId) {
-    const starrd = await prisma.starrd.findUnique({
-      where: {
-        id: payload.starrdId,
-      },
-    });
-    if (!starrd) {
-      throw new Error('Starrd Id is wrong');
-    }
-  } else {
-    throw new Error('Starrd Id is required');
+// const addReviewIntoDb = async (user: JwtPayload, req: any) => {
+//   if (payload.starrdId) {
+//     const starrd = await prisma.starrd.findUnique({
+//       where: {
+//         id: payload.starrdId,
+//       },
+//     });
+//     if (!starrd) {
+//       throw new Error('Starrd Id is wrong');
+//     }
+//   } else {
+//     throw new Error('Starrd Id is required');
+//   }
+//   const review = await prisma.review.create({
+//     data: {
+//       ...payload,
+//       userId: user.id,
+//     },
+//   });
+//    await prisma.starrd.update({
+//      data: {
+//        reviewIds: {
+//          push: review.id,
+//        },
+//      },
+//      where: {
+//        id: review.starrdId,
+//      },
+//    });
+//   return review;
+// };
+
+const addReviewIntoDb = async (user: JwtPayload, req: any) => {
+  
+
+  const files = req.files;
+  const uploadFiles = req.files.uploadFiles;
+
+  if (!files || files.length === 0) {
+    throw new Error('Please upload at least one file');
   }
+
+  const imageUrls = uploadFiles.map((e: any) => {
+    const result = e ? `${config.backend_base_url}/uploads/${e.filename}` : null;
+    return result;
+  });
+
+  const payload = req.body;
   const review = await prisma.review.create({
     data: {
       ...payload,
       userId: user.id,
+      images: imageUrls,
     },
   });
-   await prisma.starrd.update({
-     data: {
-       reviewIds: {
-         push: review.id,
-       },
-     },
-     where: {
-       id: review.starrdId,
-     },
-   });
+
+  await prisma.starrd.update({
+    data: {
+      reviewIds: {
+        push: review.id,
+      },
+    },
+    where: {
+      id: review.starrdId,
+    },
+  });
+
   return review;
 };
 

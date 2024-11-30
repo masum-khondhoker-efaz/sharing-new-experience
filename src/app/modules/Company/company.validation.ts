@@ -13,6 +13,7 @@ const OpeningHoursSchema = z.object({
 const companyValidationSchema = z.object({
   companyName: z.string(),
   description: z.string(),
+  categoryId: z.string(),
   openingHours: OpeningHoursSchema, // Reference the openingHours schema
   websiteLink: z.string().optional(),
   contact: z.string(),
