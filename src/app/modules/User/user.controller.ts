@@ -6,6 +6,8 @@ import { Request, Response } from "express";
 import pick from "../../../shared/pick";
 import { userFilterableFields } from "./user.costant";
 import { JwtPayload } from "jsonwebtoken";
+import { uploadFileToSpace } from "../../../helpars/multerUpload";
+import { uploadFileToSpaceForUpdate } from "../../../helpars/updateMulterUpload";
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
   const result = await userService.createUserIntoDb(req.body);
@@ -38,8 +40,20 @@ const getUsers = catchAsync(async (req: Request, res: Response) => {
 // get all user form db
 const updateProfile = catchAsync(async (req: Request, res: Response) => {
   const user = req?.user as JwtPayload;
+  const data = req.body;
+  const file = req.file;
+  // console.log(file, 'check file');
+  let profileData = { ...data };
+  if (file) {
+     const fileUrl = await uploadFileToSpaceForUpdate(
+       file,
+       'retire-professional',
+     );
+    profileData.profileImage = fileUrl;
+  };
+    
 
-  const result = await userService.updateProfile(user, req);
+  const result = await userService.updateProfile(user, profileData);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

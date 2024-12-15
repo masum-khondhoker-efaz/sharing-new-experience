@@ -7,6 +7,7 @@ import {starrdValidation} from './starrd.validation';
 import { fileUploader } from '../../../helpars/fileUploader';
 import { parse } from 'path';
 import { parseBody } from '../../middlewares/parseBody';
+import { multerUpload } from '../../../helpars/multerUpload';
 
 const router = express.Router();
 
@@ -14,10 +15,10 @@ const router = express.Router();
 
 router.post(
   '/create-starrd',
-  fileUploader.uploadStarrdImages,
+  multerUpload.array('uploadFiles'),
   parseBody,
-  auth(UserRole.USER),
   validateRequest(starrdValidation.starrdValidationSchema),
+  auth(UserRole.USER),
   StarrdController.createStarrd
 );
 
