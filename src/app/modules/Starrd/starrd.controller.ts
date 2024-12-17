@@ -81,6 +81,23 @@ const updateFavouriteStarrd = catchAsync(async (req: Request, res: Response) => 
     });
 });
 
+const updateSponsoredStarrd = catchAsync(
+  async (req: Request, res: Response) => {
+    const user = req?.user as JwtPayload;
+    const starrdId = req.params.starrdId;
+    const result = await StarrdServices.updateSponsoredStarrdIntoDb(
+      user,
+      starrdId
+    );
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: 'Starrd updated successfully',
+      data: result,
+    });
+  }
+);
+
 
 const updateStarrd = catchAsync(async (req: Request, res: Response) => {
     const user = req?.user as JwtPayload;
@@ -127,5 +144,6 @@ export const StarrdController = {
     getStarrdByCompany,
     getStarrdByFavourite,
     updateFavouriteStarrd,
+    updateSponsoredStarrd,
     
 };

@@ -53,6 +53,13 @@ router.patch(
   StarrdController.updateFavouriteStarrd
 );
 
+router.patch(
+  '/add-sponsored/:starrdId',
+  auth(),
+  // validateRequest(starrdValidation.starrdSponsorValidation),
+  StarrdController.updateSponsoredStarrd
+);
+
 router.put(
   '/update-starrd/:starrdId',
   auth(),

@@ -270,6 +270,21 @@ const updateFavouriteStarrdIntoDb= async (user: JwtPayload, starrdId: string) =>
   });
   return starrd;
 }
+const updateSponsoredStarrdIntoDb = async (
+  user: JwtPayload,
+  starrdId: string
+) => {
+  const starrd = await prisma.starrd.update({
+    where: {
+      userId: user.id,
+      id: starrdId,
+    },
+    data: {
+      isSponsored: true,
+    },
+  });
+  return starrd;
+};
 
 
 // update starrd
@@ -355,4 +370,5 @@ export const StarrdServices = {
   getStarrdByFavouriteFromDb,
   getStarrdByCompanyFromDb,
   updateFavouriteStarrdIntoDb,
+  updateSponsoredStarrdIntoDb,
 };

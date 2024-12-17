@@ -76,6 +76,7 @@ model Starrd {
   uploadFiles       String[]
   reviewIds         String[]       @db.ObjectId
   userId            String         @db.ObjectId
+  isSponsored       Boolean?       @default(false)
   serviceId         String?        @db.ObjectId
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
