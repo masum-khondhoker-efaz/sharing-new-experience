@@ -36,27 +36,16 @@ import config from '../../../config';
 //   return review;
 // };
 
-const addReviewIntoDb = async (user: JwtPayload, req: any) => {
+const addReviewIntoDb = async (user: JwtPayload, reviewData: any) => {
   
-
-  const files = req.files;
-  const uploadFiles = req.files.uploadFiles;
-
-  if (!files || files.length === 0) {
-    throw new Error('Please upload at least one file');
-  }
-
-  const imageUrls = uploadFiles.map((e: any) => {
-    const result = e ? `${config.backend_base_url}/uploads/${e.filename}` : null;
-    return result;
-  });
-
-  const payload = req.body;
+const { data, uploadFiles } = reviewData;
+ 
+  
   const review = await prisma.review.create({
     data: {
-      ...payload,
+      ...data,
       userId: user.id,
-      images: imageUrls,
+      images: uploadFiles,
     },
   });
 

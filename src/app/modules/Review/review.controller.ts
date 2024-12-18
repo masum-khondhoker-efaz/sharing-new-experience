@@ -4,13 +4,28 @@ import sendResponse from '../../../shared/sendResponse';
 import httpStatus from 'http-status';
 import { ReviewServices } from './review.service';
 import { JwtPayload } from 'jsonwebtoken';
+import { uploadFileToSpace } from '../../../helpars/multerUpload';
 
 // add review controller
 const addReview = catchAsync(async (req: Request, res: Response) => {
   const user = req?.user as JwtPayload;
+ const data = req.body;
+   const files = req.files as unknown as Express.Multer.File[];
  
+   if (!files || files.length === 0) {
+     throw new Error('No files found');
+   }
+ 
+   const fileUrls = await Promise.all(
+     files.map((file) => uploadFileToSpace(file, 'retire-professional'))
+   );
+ 
+   const reviewData = {
+     data,
+     uploadFiles: fileUrls, // Pass the files to the service
+   };
 
-  const result = await ReviewServices.addReviewIntoDb(user, req);
+  const result = await ReviewServices.addReviewIntoDb(user, reviewData);
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,
