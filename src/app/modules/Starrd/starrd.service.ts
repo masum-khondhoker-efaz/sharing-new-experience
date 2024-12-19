@@ -261,7 +261,6 @@ const getStarrdByIdFromDb = async (user: JwtPayload, starrdId: string) => {
 const updateFavouriteStarrdIntoDb= async (user: JwtPayload, starrdId: string) => {
   const starrd = await prisma.starrd.update({
     where: {
-      userId: user.id,
       id: starrdId,
     },
     data: {
@@ -276,7 +275,6 @@ const updateSponsoredStarrdIntoDb = async (
 ) => {
   const starrd = await prisma.starrd.update({
     where: {
-      userId: user.id,
       id: starrdId,
     },
     data: {
