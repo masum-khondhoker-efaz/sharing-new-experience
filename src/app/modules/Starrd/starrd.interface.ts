@@ -19,4 +19,5 @@ export interface IStarrd {
   websiteLink: string;
   socialLink: string[];
   serviceId?: string;
+  isSponsored?: boolean;
 }

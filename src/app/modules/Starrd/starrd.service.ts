@@ -6,27 +6,22 @@ import config from '../../../config';
 
 
 // create starrd
-const createStarrdIntoDb = async (user: JwtPayload, req: any) => {
-  const files = req.files;
-  const uploadFiles = files?.uploadFiles || [];
-
-  if (!files || files.length === 0) {
-    throw new ApiError(400, 'Please upload at least one file');
-  }
-
-  const imageUrls = uploadFiles.map((e: any) => {
-    const result = e ? `${config.backend_base_url}/uploads/${e.filename}` : null;
-    return result;
-  });
-
-  const payload = req.body;
+const createStarrdIntoDb = async (user: JwtPayload, starrdData: any) => {
+  const { data, uploadFiles } = starrdData;
 
   const transaction = await prisma.$transaction(async (prisma) => {
     const starrd = await prisma.starrd.create({
       data: {
-        ...payload,
+        name: data.name,
+        companyName: data.companyName,
+        websiteLink: data.websiteLink,
+        personalNote: data.personalNote,
+        socialLink: data.socialLink,
+        location: data.location as object,
         userId: user.id,
-        uploadFiles: imageUrls,
+        uploadFiles: uploadFiles,
+        categoryName: data.categoryName,
+        subCategoryName: data.subCategoryName,
       },
     });
 
@@ -52,7 +47,7 @@ const createStarrdIntoDb = async (user: JwtPayload, req: any) => {
         company = await prisma.company.create({
           data: {
             companyName: starrd.companyName,
-            uploadFiles: imageUrls,
+            uploadFiles: uploadFiles,
             websiteLink: starrd.websiteLink,
             socialLink: starrd.socialLink,
             location: starrd.location as object,
@@ -138,7 +133,7 @@ const createStarrdIntoDb = async (user: JwtPayload, req: any) => {
 
     return starrd;
   });
-  
+
   return transaction;
 };
 
@@ -275,6 +270,21 @@ const updateFavouriteStarrdIntoDb= async (user: JwtPayload, starrdId: string) =>
   });
   return starrd;
 }
+const updateSponsoredStarrdIntoDb = async (
+  user: JwtPayload,
+  starrdId: string
+) => {
+  const starrd = await prisma.starrd.update({
+    where: {
+      userId: user.id,
+      id: starrdId,
+    },
+    data: {
+      isSponsored: true,
+    },
+  });
+  return starrd;
+};
 
 
 // update starrd
@@ -360,4 +370,5 @@ export const StarrdServices = {
   getStarrdByFavouriteFromDb,
   getStarrdByCompanyFromDb,
   updateFavouriteStarrdIntoDb,
+  updateSponsoredStarrdIntoDb,
 };

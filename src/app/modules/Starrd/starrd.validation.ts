@@ -22,7 +22,12 @@ const starrdFavoriteValidation = z.object({
     favorite: z.boolean().optional(),
 });
 
+const starrdSponsorValidation = z.object({
+    isSponsored: z.boolean(),
+});
+
 export const starrdValidation = { 
     starrdValidationSchema,
-    starrdFavoriteValidation
+    starrdFavoriteValidation,
+    starrdSponsorValidation,
 };

@@ -7,6 +7,8 @@ import { UserRole } from "@prisma/client";
 import { fileUploader } from "../../../helpars/fileUploader";
 import { parse } from "path";
 import { parseBody } from "../../middlewares/parseBody";
+import { multerUpload } from "../../../helpars/multerUpload";
+import { updateMulterUpload } from "../../../helpars/updateMulterUpload";
 
 const router = express.Router();
 
@@ -29,7 +31,7 @@ router.get("/", userController.getUsers);
 // *!profile user
 router.put(
   '/profile-update',
-  fileUploader.uploadprofileImage,
+  updateMulterUpload.single('profileImage'),
   parseBody,
   validateRequest(UserValidation.userUpdateSchema),
   auth(),
